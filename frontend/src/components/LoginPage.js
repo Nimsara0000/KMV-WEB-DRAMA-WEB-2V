@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+// 🛑 BASE URL එක ඔබගේ Render URL එකට සකස් කර ඇත
+const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
+
 const LoginPage = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
@@ -10,10 +13,9 @@ const LoginPage = ({ onLoginSuccess }) => {
         e.preventDefault();
         setError('');
         try {
-            // Uses the hardcoded login route created in server.js
-            const res = await axios.post('http://localhost:5000/api/admin/login', { email }); 
+            // Axios call to the deployed backend
+            const res = await axios.post(`${BASE_URL}/api/admin/login`, { email }); 
             if (res.data.success) {
-                // Set the flag in local storage and call the parent function
                 localStorage.setItem('isAdminLoggedIn', 'true'); 
                 onLoginSuccess();
             }

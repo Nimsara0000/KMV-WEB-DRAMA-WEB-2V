@@ -1,0 +1,23 @@
+/* frontend/src/App.css */
+
+/* .App class එක සඳහා මූලික CSS එක */
+.App {
+  /* text-align: center;  අපේ App.js එකේ styles නිසා මෙය අත්‍යවශ්‍ය නැත, නමුත් දමමු. */
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* ඔබට ගැලපෙන පරිදි වෙනස් කරගත හැකි පොදු විලාසිතා */
+h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+/* Nav Bar හි ඇති බොත්තම් සඳහා මූලික විලාසිතා */
+nav button {
+  transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+  background-color: #e0e0e0; /* Hover effect */
+}

@@ -3,20 +3,22 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-// Connect to the Socket.io server (Ensure this URL matches your backend server.js)
-const socket = io('https://kmv-web-drama-web-2v.onrender.com'); 
+// 🛑 BASE URL එක ඔබගේ Render URL එකට සකස් කර ඇත
+const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
+
+// Socket.io connection
+const socket = io(BASE_URL); 
 
 const GRADES = ['6 ශ්‍රේණිය', '7 ශ්‍රේණිය', '8 ශ්‍රේණිය', '9 ශ්‍රේණිය', '10 ශ්‍රේණිය', '11 ශ්‍රේණිය'];
 
-// Initial state for the student form
 const initialStudentState = {
     fullName: '',
-    dateOfBirth: '', // This should be 'YYYY-MM-DD' format for HTML input type="date"
+    dateOfBirth: '', 
     grade: GRADES[0],
     parentNameFather: '',
     parentNameMother: '',
     contactNumber: '',
-    studentPhoto: '', // URL or path
+    studentPhoto: '', 
     notes: ''
 };
 
@@ -31,7 +33,8 @@ const AdminDashboard = ({ onLogout }) => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/students');
+                // Axios call to the deployed backend
+                const res = await axios.get(`${BASE_URL}/api/students`); 
                 setStudents(res.data);
                 setLoading(false);
             } catch (err) {
@@ -62,22 +65,19 @@ const AdminDashboard = ({ onLogout }) => {
     // 2. Handle Form Submission (Create or Update)
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Prepare data for MongoDB (Ensure dateOfBirth is sent correctly)
         const dataToSend = { ...formData };
 
         try {
             if (isEditing) {
-                // UPDATE operation (PUT request)
-                await axios.put(`http://localhost:5000/api/students/${editingId}`, dataToSend);
+                // UPDATE operation (PUT)
+                await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
                 alert('Student data updated successfully! (Real-time update triggered)');
             } else {
-                // CREATE operation (POST request)
-                await axios.post('http://localhost:5000/api/students', dataToSend);
+                // CREATE operation (POST)
+                await axios.post(`${BASE_URL}/api/students`, dataToSend); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
             
-            // Clear form and reset state
             resetForm();
             
         } catch (err) {
@@ -95,16 +95,14 @@ const AdminDashboard = ({ onLogout }) => {
 
     // Set up form for editing an existing student
     const startEdit = (student) => {
-        // Format date from Date object/string to 'YYYY-MM-DD' string for the input field
         const dobString = student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().substring(0, 10) : '';
 
         setFormData({ 
             ...student,
-            dateOfBirth: dobString // Use the formatted date
+            dateOfBirth: dobString 
         });
         setEditingId(student._id);
         setIsEditing(true);
-        // Scroll to the form
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -112,10 +110,9 @@ const AdminDashboard = ({ onLogout }) => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to PERMANENTLY delete this student record?')) {
             try {
-                // DELETE request
-                await axios.delete(`http://localhost:5000/api/students/${id}`);
+                // DELETE operation
+                await axios.delete(`${BASE_URL}/api/students/${id}`); 
                 alert('Student removed successfully! (Real-time update triggered)');
-                // If the deleted student was being edited, reset the form
                 if (editingId === id) {
                     resetForm();
                 }
@@ -142,7 +139,7 @@ const AdminDashboard = ({ onLogout }) => {
                 <h2>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields */}
+                    {/* Input Fields (same as before) */}
                     <label>Full Name:</label>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required />
                     
@@ -163,7 +160,6 @@ const AdminDashboard = ({ onLogout }) => {
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required />
                     
                     <label>Student Photo URL:</label> 
-                    {/* In a production app, this would be a file upload handler */}
                     <input type="text" name="studentPhoto" value={formData.studentPhoto} onChange={handleChange} />
                     
                     <label>Notes:</label>
@@ -182,7 +178,7 @@ const AdminDashboard = ({ onLogout }) => {
 
             <hr style={{ margin: '40px 0', border: '1px dashed #ccc' }} />
 
-            {/* --- Student List for Editing/Deleting --- */}
+            {/* --- Student List for Editing/Deleting (same as before) --- */}
             <h2>📋 Current Registered Students</h2>
             <div style={styles.studentList}>
                 {students.map(student => (
@@ -203,7 +199,7 @@ const AdminDashboard = ({ onLogout }) => {
     );
 };
 
-// Basic Styling (Should ideally be in a separate CSS file)
+// Basic Styling (same as before)
 const styles = {
     container: { padding: '20px', position: 'relative' },
     logoutButton: { position: 'absolute', top: '20px', right: '20px', padding: '10px 15px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' },

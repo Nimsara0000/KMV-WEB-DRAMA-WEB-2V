@@ -2,10 +2,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
-import StudentCard from './StudentCard'; // StudentCard Component එක අවශ්‍යයි
+import StudentCard from './StudentCard';
+
+// 🛑 BASE URL එක ඔබගේ Render URL එකට සකස් කර ඇත
+const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
 
 // Connect to the Socket.io server
-const socket = io('http://localhost:5000'); 
+const socket = io(BASE_URL); 
 
 const GRADES = ['6 ශ්‍රේණිය', '7 ශ්‍රේණිය', '8 ශ්‍රේණිය', '9 ශ්‍රේණිය', '10 ශ්‍රේණිය', '11 ශ්‍රේණිය'];
 
@@ -18,7 +21,8 @@ const HomeDashboard = () => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/students');
+                // Axios call to the deployed backend
+                const res = await axios.get(`${BASE_URL}/api/students`); 
                 setStudents(res.data);
                 setLoading(false);
             } catch (err) {
@@ -89,6 +93,7 @@ const HomeDashboard = () => {
     );
 };
 
+// Basic Styling (same as before)
 const styles = {
     container: { padding: '20px' },
     searchBar: { padding: '12px', width: '100%', maxWidth: '600px', margin: '20px 0', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' },

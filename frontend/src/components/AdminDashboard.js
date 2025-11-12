@@ -4,7 +4,7 @@ import axios from 'axios';
 import io from 'socket.io-client';
 
 // Connect to the Socket.io server (Ensure this URL matches your backend server.js)
-const socket = io('http://localhost:5000'); 
+const socket = io('https://kmv-web-drama-web-2v.onrender.com'); 
 
 const GRADES = ['6 ශ්‍රේණිය', '7 ශ්‍රේණිය', '8 ශ්‍රේණිය', '9 ශ්‍රේණිය', '10 ශ්‍රේණිය', '11 ශ්‍රේණිය'];
 

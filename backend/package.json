@@ -1,0 +1,24 @@
+// backend/package.json
+{
+  "name": "school-drama-backend",
+  "version": "1.0.0",
+  "description": "Backend for School Drama Registration System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js" 
+  },
+  "keywords": [
+    "mern",
+    "socket.io",
+    "node"
+  ],
+  "author": "Nimsara",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongoose": "^8.19.3",
+    "socket.io": "^4.8.1"
+  }
+}

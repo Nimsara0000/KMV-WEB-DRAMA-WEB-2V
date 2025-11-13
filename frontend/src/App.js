@@ -46,7 +46,8 @@ function App() {
                     {isAdminLoggedIn ? (
                         <>
                             <button onClick={() => setCurrentPage('admin')} style={styles.navButton}>Admin Panel</button>
-                            <button onClick={handleLogout} style={styles.navButton}>Logout</button>
+                            {/* 🛑 Logout බොත්තමට styles.navButtonLogout යොදා ඇත */}
+                            <button onClick={handleLogout} style={styles.navButtonLogout}>Logout</button>
                         </>
                     ) : (
                         <button onClick={() => setCurrentPage('login')} style={styles.navButton}>Admin Login</button>
@@ -60,39 +61,57 @@ function App() {
     );
 }
 
-// Basic Styling for School Type (use CSS file for better practice)
+// ✨ යාවත්කාලීන කළ විලාසිතා ✨
 const styles = {
     appContainer: {
-        fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#f0f0f0', // Light background
+        fontFamily: 'Roboto, Arial, sans-serif',
+        // 'index.css' මගින් පසුබිම පාලනය කරයි (Gradient)
+        backgroundColor: 'transparent', 
         minHeight: '100vh',
     },
     header: {
-        backgroundColor: '#0056b3', // School blue
+        backgroundColor: '#1E90FF', // Royal Blue
         color: 'white',
-        padding: '15px 30px',
+        padding: '20px 30px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        // වඩාත් කැපී පෙනෙන සෙවණැල්ල
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)', 
     },
+    // Home සහ Admin Panel බොත්තම් සඳහා
     navButton: {
-        marginLeft: '10px',
-        padding: '8px 15px',
+        marginLeft: '15px',
+        padding: '10px 18px',
         backgroundColor: 'white',
-        color: '#0056b3',
-        border: 'none',
-        borderRadius: '5px',
+        color: '#1E90FF', // Button text color matches header
+        border: '2px solid white', 
+        borderRadius: '25px', // Rounded buttons
         cursor: 'pointer',
         fontWeight: 'bold',
+        transition: 'all 0.3s ease',
+    },
+    // Logout බොත්තම සඳහා (වෙනස් වර්ණයකින් කැපී පෙනීමට)
+    navButtonLogout: {
+        marginLeft: '15px',
+        padding: '10px 18px',
+        backgroundColor: '#FF6347', // Tomato Red
+        color: 'white',
+        border: '2px solid #FF6347',
+        borderRadius: '25px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'all 0.3s ease',
     },
     mainContent: {
-        padding: '20px',
+        padding: '30px',
         maxWidth: '1200px',
-        margin: '0 auto',
+        margin: '30px auto', 
         backgroundColor: 'white',
-        minHeight: '85vh',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.05)',
+        minHeight: '80vh',
+        borderRadius: '12px',
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)', 
+        overflow: 'hidden',
     }
 };
 

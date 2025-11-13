@@ -5,6 +5,9 @@ const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// 🛑 Frontend Vercel URL එක නිවැරදිව මෙහි සඳහන් කර ඇත
+const VERCEL_FRONTEND_URL = 'https://kmv-web-drama.vercel.app';
+
 // MongoDB URL (ඔබ ලබා දුන් URL එක)
 const mongoURI = 'mongodb+srv://nimatest:nimatest@nimatest.bdf6c2a.mongodb.net/'; 
 
@@ -24,17 +27,24 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.io Server Setup
-// Frontend (React) එක http://localhost:3000 හි ධාවනය වන බව සලකයි
+// Socket.io සඳහා CORS සැකසීම - Vercel URL එකට සකසා ඇත
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000", 
-        methods: ["GET", "POST", "PUT", "DELETE"]
+        origin: VERCEL_FRONTEND_URL, // ✅ නිවැරදි කිරීම
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true, // අවශ්‍ය නම්, cookie/header credentials සඳහා
     }
 });
 
 // Middleware
 app.use(express.json()); 
-app.use(cors({ origin: "http://localhost:3000" })); 
+
+// Express CORS Middleware සැකසීම - Vercel URL එකට සකසා ඇත
+app.use(cors({ 
+    origin: VERCEL_FRONTEND_URL, // ✅ නිවැරදි කිරීම
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // අවශ්‍ය නම්
+})); 
 
 // Inject socket.io into request object to use in controllers
 app.use((req, res, next) => {

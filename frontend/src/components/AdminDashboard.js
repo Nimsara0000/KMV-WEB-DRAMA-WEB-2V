@@ -3,10 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
 
-// 🛑 BASE URL එක ඔබගේ Render URL එකට සකස් කර ඇත
 const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
-
-// Socket.io connection
 const socket = io(BASE_URL); 
 
 const GRADES = ['6 ශ්‍රේණිය', '7 ශ්‍රේණිය', '8 ශ්‍රේණිය', '9 ශ්‍රේණිය', '10 ශ්‍රේණිය', '11 ශ්‍රේණිය'];
@@ -29,7 +26,6 @@ const AdminDashboard = ({ onLogout }) => {
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // 1. Initial Data Fetch and Real-time Listener
     useEffect(() => {
         const fetchStudents = async () => {
             try {
@@ -40,11 +36,9 @@ const AdminDashboard = ({ onLogout }) => {
                 console.error('Error fetching students:', err);
             }
         };
-        
         fetchStudents();
         
         socket.on('students_updated', (updatedStudents) => {
-            console.log('Real-time data received and updating local state.');
             setStudents(updatedStudents);
         });
 
@@ -70,9 +64,7 @@ const AdminDashboard = ({ onLogout }) => {
                 await axios.post(`${BASE_URL}/api/students`, dataToSend); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
-            
             resetForm();
-            
         } catch (err) {
             console.error('Submission Error:', err.response?.data || err.message);
             alert(`Error during submission: ${err.response?.data?.msg || 'Check console.'}`);
@@ -86,8 +78,7 @@ const AdminDashboard = ({ onLogout }) => {
     };
 
     const startEdit = (student) => {
-        const dobString = student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().substring(0, 10) : '';
-
+        const dobString = student.dateOfBirth || ''; // Date format should match YYYY-MM-DD
         setFormData({ 
             ...student,
             dateOfBirth: dobString 
@@ -124,17 +115,24 @@ const AdminDashboard = ({ onLogout }) => {
             <button onClick={onLogout} style={styles.logoutButton}>Logout</button>
             
             <div style={styles.formSection}>
-                {/* 🛑 H2 Heading එක Grid එකට ගැලපීමට */}
                 <h2 style={styles.formHeading}>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields (text, date, select) - 🛑 gridColumn එක එකතු කර ඇත */}
+                    {/* Input Fields (text, date, select) */}
                     <label>Full Name:</label>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
                     <label>Date of Birth:</label>
-                    {/* Date Input එකට width එක 100% ක් ලබා දී ඇත */}
-                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
+                    {/* 🛑 DOB Input එක Manual Typing සඳහා වෙනස් කර ඇත */}
+                    <input 
+                        type="text" 
+                        name="dateOfBirth" 
+                        value={formData.dateOfBirth} 
+                        onChange={handleChange} 
+                        style={{...styles.inputField, ...styles.gridColumnTwo}} 
+                        placeholder="YYYY-MM-DD (උදා: 2005-08-15)"
+                        required 
+                    />
                     
                     <label>Grade:</label>
                     <select name="grade" value={formData.grade} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required>
@@ -149,7 +147,6 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Contact Number:</label>
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
-                    {/* Student Photo URL Input with Catbox.moe Helper Button */}
                     <label>Student Photo URL:</label> 
                     <div style={styles.urlInputContainer}> 
                         <input 
@@ -171,7 +168,6 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Notes:</label>
                     <textarea name="notes" value={formData.notes} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}}></textarea>
                     
-                    {/* Buttons Group */}
                     <div style={styles.buttonGroup}>
                         {isEditing && (
                             <button type="button" onClick={resetForm} style={styles.cancelButton}>
@@ -187,8 +183,7 @@ const AdminDashboard = ({ onLogout }) => {
 
             <hr style={{ margin: '40px 0', border: '1px dashed #ccc' }} />
 
-            {/* Student List */}
-            <h2>📋 Current Registered Students</h2>
+            <h2 style={styles.listHeading}>📋 Current Registered Students</h2> 
             <div style={styles.studentList}>
                 {students.map(student => (
                     <div key={student._id} style={styles.studentItem}>
@@ -208,7 +203,6 @@ const AdminDashboard = ({ onLogout }) => {
     );
 };
 
-// ✨ යාවත්කාලීන කළ විලාසිතා (Styles) ✨
 const styles = {
     container: { 
         padding: '30px', 
@@ -237,40 +231,33 @@ const styles = {
         backgroundColor: '#f9f9ff',
         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
     },
-    // 🛑 H2 Alignments
     formHeading: {
         marginBottom: '20px',
-        gridColumn: '1 / 3', 
-        maxWidth: '900px',
+        maxWidth: '900px', 
         margin: '0 auto 20px auto', 
-        paddingLeft: '20px', // Form Container Padding එකට ගැලපීමට
+        textAlign: 'center', 
     },
     formContainer: { 
         display: 'grid', 
         gridTemplateColumns: '180px 1fr', 
         gap: '15px 30px', 
         maxWidth: '900px',
-        margin: '0 auto', // 🛑 මධ්‍යගත කර ඇත
+        margin: '0 auto', 
         padding: '20px' 
     },
-    
-    // 🛑 Inputs/Textareas සඳහා පොදු විලාසිතාව
     inputField: { 
         padding: '10px', 
         border: '1px solid #ccc', 
         borderRadius: '6px', 
         fontSize: '1em',
         boxSizing: 'border-box',
-        width: '100%', // 🛑 100% width ලබා දී ඇත
+        width: '100%', 
     },
-    // 🛑 මෙය නව Style එකකි (දෙවන තීරුවට පමණක් සීමා කිරීමට)
     gridColumnTwo: {
         gridColumn: '2 / 3',
     },
-    
-    // URL Input එක සහ බොත්තම
     urlInputContainer: {
-        gridColumn: '2 / 3', // නිවැරදි Grid පිහිටීම
+        gridColumn: '2 / 3', 
         display: 'flex',
         gap: '10px',
         alignItems: 'center',
@@ -287,8 +274,6 @@ const styles = {
         whiteSpace: 'nowrap', 
         height: '40px', 
     },
-    
-    // Buttons Group Wrapper
     buttonGroup: {
         gridColumn: '2 / 3', 
         display: 'flex',
@@ -297,8 +282,6 @@ const styles = {
         marginTop: '15px',
         alignItems: 'center',
     },
-
-    // Buttons Styles
     submitButton: { 
         backgroundColor: '#28a745', 
         color: 'white', 
@@ -307,7 +290,6 @@ const styles = {
         borderRadius: '8px', 
         cursor: 'pointer', 
         fontWeight: 'bold',
-        transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     updateButton: { 
@@ -318,7 +300,6 @@ const styles = {
         borderRadius: '8px', 
         cursor: 'pointer', 
         fontWeight: 'bold',
-        transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     cancelButton: { 
@@ -329,16 +310,21 @@ const styles = {
         borderRadius: '8px', 
         cursor: 'pointer', 
         fontWeight: 'bold',
-        transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
-    
-    // Student List Styles
+    listHeading: {
+        maxWidth: '900px', 
+        margin: '40px auto 20px auto', 
+        padding: '0 20px', 
+    },
     studentList: { 
         marginTop: '20px', 
         display: 'flex', 
         flexDirection: 'column', 
-        gap: '15px' 
+        gap: '15px',
+        maxWidth: '900px',
+        margin: '0 auto', 
+        padding: '0 20px', 
     },
     studentItem: { 
         display: 'flex', 
@@ -373,8 +359,6 @@ const styles = {
         padding: '8px 12px', 
         borderRadius: '25px', 
         cursor: 'pointer',
-        fontWeight: 'bold',
-        transition: 'all 0.3s ease',
     },
     deleteButton: { 
         backgroundColor: '#dc3545', 
@@ -383,8 +367,6 @@ const styles = {
         padding: '8px 12px', 
         borderRadius: '25px', 
         cursor: 'pointer',
-        fontWeight: 'bold',
-        transition: 'all 0.3s ease',
     },
 };
 

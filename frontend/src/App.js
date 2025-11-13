@@ -40,7 +40,7 @@ function App() {
     return (
         <div className="App" style={styles.appContainer}>
             <header style={styles.header}>
-                <h1>School Drama Registration</h1>
+                <h1>KMV SCHOOL DRAMA REGISTRATIONS</h1>
                 <nav>
                     <button onClick={() => setCurrentPage('home')} style={styles.navButton}>Home</button>
                     {isAdminLoggedIn ? (

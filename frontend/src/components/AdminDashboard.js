@@ -33,7 +33,6 @@ const AdminDashboard = ({ onLogout }) => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                // Axios call to the deployed backend
                 const res = await axios.get(`${BASE_URL}/api/students`); 
                 setStudents(res.data);
                 setLoading(false);
@@ -44,38 +43,30 @@ const AdminDashboard = ({ onLogout }) => {
         
         fetchStudents();
         
-        // Listen for real-time updates from the server
         socket.on('students_updated', (updatedStudents) => {
             console.log('Real-time data received and updating local state.');
             setStudents(updatedStudents);
         });
 
-        // Cleanup function
         return () => {
             socket.off('students_updated');
         };
     }, []);
 
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // 2. Handle Form Submission (Create or Update)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // සාමාන්‍ය JSON දත්ත යවමු
         const dataToSend = { ...formData };
 
         try {
             if (isEditing) {
-                // UPDATE operation (PUT)
                 await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
                 alert('Student data updated successfully! (Real-time update triggered)');
             } else {
-                // CREATE operation (POST)
                 await axios.post(`${BASE_URL}/api/students`, dataToSend); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
@@ -88,14 +79,12 @@ const AdminDashboard = ({ onLogout }) => {
         }
     };
 
-    // Reset Form Utility
     const resetForm = () => {
         setFormData(initialStudentState);
         setIsEditing(false);
         setEditingId(null);
     };
 
-    // Set up form for editing an existing student
     const startEdit = (student) => {
         const dobString = student.dateOfBirth ? new Date(student.dateOfBirth).toISOString().substring(0, 10) : '';
 
@@ -108,11 +97,9 @@ const AdminDashboard = ({ onLogout }) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // 3. Handle Deletion
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to PERMANENTLY delete this student record?')) {
             try {
-                // DELETE operation
                 await axios.delete(`${BASE_URL}/api/students/${id}`); 
                 alert('Student removed successfully! (Real-time update triggered)');
                 if (editingId === id) {
@@ -125,7 +112,6 @@ const AdminDashboard = ({ onLogout }) => {
         }
     };
     
-    // Authorization Check
     if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
         return <p>🔒 Access Denied. Please log in as admin.</p>;
     }
@@ -138,30 +124,32 @@ const AdminDashboard = ({ onLogout }) => {
             <button onClick={onLogout} style={styles.logoutButton}>Logout</button>
             
             <div style={styles.formSection}>
-                <h2>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
+                {/* 🛑 H2 Heading එක Grid එකට ගැලපීමට */}
+                <h2 style={styles.formHeading}>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields (text, date, select) */}
+                    {/* Input Fields (text, date, select) - 🛑 gridColumn එක එකතු කර ඇත */}
                     <label>Full Name:</label>
-                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
+                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
                     <label>Date of Birth:</label>
-                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} style={styles.inputField} required />
+                    {/* Date Input එකට width එක 100% ක් ලබා දී ඇත */}
+                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
                     <label>Grade:</label>
-                    <select name="grade" value={formData.grade} onChange={handleChange} style={styles.inputField} required>
+                    <select name="grade" value={formData.grade} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required>
                         {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                     </select>
 
                     <label>Father's Name:</label>
-                    <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={styles.inputField} required />
+                    <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     <label>Mother's Name:</label>
-                    <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={styles.inputField} required />
+                    <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
                     <label>Contact Number:</label>
-                    <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
+                    <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}} required />
                     
-                    {/* 🛑 Student Photo URL Input with Catbox.moe Helper Button */}
+                    {/* Student Photo URL Input with Catbox.moe Helper Button */}
                     <label>Student Photo URL:</label> 
                     <div style={styles.urlInputContainer}> 
                         <input 
@@ -181,9 +169,9 @@ const AdminDashboard = ({ onLogout }) => {
                     </div>
                     
                     <label>Notes:</label>
-                    <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>
+                    <textarea name="notes" value={formData.notes} onChange={handleChange} style={{...styles.inputField, ...styles.gridColumnTwo}}></textarea>
                     
-                    {/* 🛑 Buttons Group (සමබරතාවය සඳහා) */}
+                    {/* Buttons Group */}
                     <div style={styles.buttonGroup}>
                         {isEditing && (
                             <button type="button" onClick={resetForm} style={styles.cancelButton}>
@@ -199,7 +187,7 @@ const AdminDashboard = ({ onLogout }) => {
 
             <hr style={{ margin: '40px 0', border: '1px dashed #ccc' }} />
 
-            {/* --- Student List for Editing/Deleting (සමබරතාවය වැඩි දියුණු කළ) --- */}
+            {/* Student List */}
             <h2>📋 Current Registered Students</h2>
             <div style={styles.studentList}>
                 {students.map(student => (
@@ -233,7 +221,7 @@ const styles = {
         top: '30px', 
         right: '30px', 
         padding: '10px 18px', 
-        backgroundColor: '#FF6347', // Tomato Red
+        backgroundColor: '#FF6347', 
         color: 'white', 
         border: 'none', 
         borderRadius: '25px', 
@@ -246,40 +234,53 @@ const styles = {
         border: '1px solid #e0e0e0', 
         borderRadius: '10px', 
         marginBottom: '40px', 
-        backgroundColor: '#f9f9ff', // Very light blue/purple tint
+        backgroundColor: '#f9f9ff',
         boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+    },
+    // 🛑 H2 Alignments
+    formHeading: {
+        marginBottom: '20px',
+        gridColumn: '1 / 3', 
+        maxWidth: '900px',
+        margin: '0 auto 20px auto', 
+        paddingLeft: '20px', // Form Container Padding එකට ගැලපීමට
     },
     formContainer: { 
         display: 'grid', 
-        // 🛑 සමබරතාවය සඳහා වෙනස් කර ඇත
         gridTemplateColumns: '180px 1fr', 
         gap: '15px 30px', 
-        maxWidth: '900px', // 🛑 පළල වැඩි කර ඇත
-        margin: '20px auto', 
+        maxWidth: '900px',
+        margin: '0 auto', // 🛑 මධ්‍යගත කර ඇත
         padding: '20px' 
     },
-    // Input/Select/Textarea සඳහා පොදු විලාසිතාව
+    
+    // 🛑 Inputs/Textareas සඳහා පොදු විලාසිතාව
     inputField: { 
         padding: '10px', 
         border: '1px solid #ccc', 
         borderRadius: '6px', 
         fontSize: '1em',
         boxSizing: 'border-box',
+        width: '100%', // 🛑 100% width ලබා දී ඇත
+    },
+    // 🛑 මෙය නව Style එකකි (දෙවන තීරුවට පමණක් සීමා කිරීමට)
+    gridColumnTwo: {
+        gridColumn: '2 / 3',
     },
     
     // URL Input එක සහ බොත්තම
     urlInputContainer: {
-        gridColumn: '2 / 3',
+        gridColumn: '2 / 3', // නිවැරදි Grid පිහිටීම
         display: 'flex',
         gap: '10px',
         alignItems: 'center',
     },
     uploadHelperButton: {
         padding: '10px 15px',
-        backgroundColor: '#FFA500', // Orange
-        color: 'white',
-        border: 'none',
-        borderRadius: '6px',
+        backgroundColor: '#FFA500', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '6px', 
         cursor: 'pointer',
         fontWeight: 'bold',
         transition: 'background-color 0.3s ease',
@@ -287,21 +288,21 @@ const styles = {
         height: '40px', 
     },
     
-    // 🛑 නව Buttons Group Wrapper එක
+    // Buttons Group Wrapper
     buttonGroup: {
-        gridColumn: '2 / 3', // දෙවන තීරුවට සීමා කර ඇත
+        gridColumn: '2 / 3', 
         display: 'flex',
-        justifyContent: 'flex-end', // දකුණට ගෙන යන්න
+        justifyContent: 'flex-end', 
         gap: '15px',
         marginTop: '15px',
         alignItems: 'center',
     },
 
-    // බොත්තම් සඳහා විලාසිතාව
+    // Buttons Styles
     submitButton: { 
-        backgroundColor: '#28a745', // Green 
+        backgroundColor: '#28a745', 
         color: 'white', 
-        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
+        padding: '12px 25px', 
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
@@ -310,9 +311,9 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     updateButton: { 
-        backgroundColor: '#1E90FF', // Blue for Update
+        backgroundColor: '#1E90FF', 
         color: 'white', 
-        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
+        padding: '12px 25px', 
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
@@ -323,7 +324,7 @@ const styles = {
     cancelButton: { 
         backgroundColor: '#6c757d', 
         color: 'white', 
-        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
+        padding: '12px 25px', 
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
@@ -332,7 +333,7 @@ const styles = {
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     
-    // 🛑 Student List Styles (සමබරතාවය වැඩි දියුණු කළ)
+    // Student List Styles
     studentList: { 
         marginTop: '20px', 
         display: 'flex', 
@@ -343,11 +344,11 @@ const styles = {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between', 
-        padding: '15px 20px', // 🛑 Padding වෙනස් කර ඇත
+        padding: '15px 20px', 
         border: '1px solid #eee', 
         borderRadius: '8px', 
-        backgroundColor: '#fff', // සුදු පසුබිමක්
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', // 🛑 සෙවනැල්ලක් වැඩි කර ඇත
+        backgroundColor: '#fff', 
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', 
     },
     photo: { 
         width: '60px', 
@@ -359,11 +360,11 @@ const styles = {
     },
     details: { 
         flexGrow: 1,
-        marginLeft: '15px', // Photo එකට පසු කුඩා ඉඩක්
+        marginLeft: '15px', 
     },
     actions: { 
         display: 'flex', 
-        gap: '12px' // Buttons අතර දුර වැඩි කර ඇත
+        gap: '12px' 
     },
     editButton: { 
         backgroundColor: '#ffc107', 

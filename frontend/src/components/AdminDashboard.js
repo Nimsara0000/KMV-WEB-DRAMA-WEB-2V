@@ -139,7 +139,7 @@ const AdminDashboard = ({ onLogout }) => {
                 <h2>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields (styles.inputField එකතු කරන්න) */}
+                    {/* Input Fields වලට styles.inputField යොදා ඇත */}
                     <label>Full Name:</label>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
                     
@@ -159,7 +159,6 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Contact Number:</label>
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     
-                    {/* 🛑 Photo URL එකට inputField යොදා ඇත */}
                     <label>Student Photo URL:</label> 
                     <input type="text" name="studentPhoto" value={formData.studentPhoto} onChange={handleChange} style={styles.inputField} />
                     
@@ -200,7 +199,7 @@ const AdminDashboard = ({ onLogout }) => {
     );
 };
 
-// ✨ වැඩි දියුණු කළ විලාසිතා (Styles) ✨
+// ✨ නිවැරදි කළ විලාසිතා (Styles) ✨
 const styles = {
     container: { 
         padding: '30px', 
@@ -246,8 +245,8 @@ const styles = {
         boxSizing: 'border-box',
     },
     
-    // බොත්තම් සඳහා පොදු විලාසිතාව
-    formButton: {
+    // බොත්තම් සඳහා මූලික විලාසිතාව
+    baseButton: {
         gridColumn: '1 / 3', 
         padding: '12px', 
         border: 'none', 
@@ -261,18 +260,44 @@ const styles = {
     submitButton: { 
         backgroundColor: '#28a745', // Green 
         color: 'white', 
-        ...this.formButton
+        // 🛑 baseButton එක manually apply කර ඇත (error fix)
+        gridColumn: '1 / 3', 
+        padding: '12px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        marginTop: '15px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     updateButton: { 
         backgroundColor: '#1E90FF', // Blue for Update
         color: 'white', 
-        ...this.formButton
+        // 🛑 baseButton එක manually apply කර ඇත (error fix)
+        gridColumn: '1 / 3', 
+        padding: '12px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        marginTop: '15px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     cancelButton: { 
         backgroundColor: '#6c757d', 
         color: 'white', 
         marginTop: '5px',
-        ...this.formButton
+        // 🛑 baseButton එක manually apply කර ඇත (error fix)
+        gridColumn: '1 / 3', 
+        padding: '12px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
     studentList: { 
         marginTop: '20px', 
@@ -306,22 +331,35 @@ const styles = {
         gap: '10px' 
     },
     // Edit/Delete list buttons
-    listButton: {
+    listButtonBase: {
         border: 'none', 
         padding: '8px 12px', 
         borderRadius: '25px', // Rounded buttons
         cursor: 'pointer',
         fontWeight: 'bold',
+        transition: 'all 0.3s ease',
     },
     editButton: { 
         backgroundColor: '#ffc107', 
         color: 'black',
-        ...this.listButton
+        // listButtonBase properties
+        border: 'none', 
+        padding: '8px 12px', 
+        borderRadius: '25px', 
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'all 0.3s ease',
     },
     deleteButton: { 
         backgroundColor: '#dc3545', 
         color: 'white', 
-        ...this.listButton
+        // listButtonBase properties
+        border: 'none', 
+        padding: '8px 12px', 
+        borderRadius: '25px', 
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'all 0.3s ease',
     },
 };
 

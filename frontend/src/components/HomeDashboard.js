@@ -1,104 +1,176 @@
 // frontend/src/components/HomeDashboard.js
-import React, { useState, useEffect, useMemo } from 'react';
-import io from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import StudentCard from './StudentCard';
+import io from 'socket.io-client';
 
-// 🛑 BASE URL එක ඔබගේ Render URL එකට සකස් කර ඇත
 const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
-
-// Connect to the Socket.io server
 const socket = io(BASE_URL); 
 
-const GRADES = ['6 ශ්‍රේණිය', '7 ශ්‍රේණිය', '8 ශ්‍රේණිය', '9 ශ්‍රේණිය', '10 ශ්‍රේණිය', '11 ශ්‍රේණිය'];
+// Grade Colors for Aesthetic Appeal
+const GRADE_COLORS = {
+    '6 ශ්‍රේණිය': '#A8E6CF', // Light Green
+    '7 ශ්‍රේණිය': '#FFC3A0', // Light Coral
+    '8 ශ්‍රේණිය': '#FF6768', // Strong Coral
+    '9 ශ්‍රේණිය': '#6AB4FF', // Light Blue
+    '10 ශ්‍රේණිය': '#FFD700', // Gold
+    '11 ශ්‍රේණිය': '#B28CFF', // Lavender
+};
 
-const HomeDashboard = () => {
-    const [students, setStudents] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+const GRADES = Object.keys(GRADE_COLORS);
+
+const HomeDashboard = ({ onLogout }) => {
+    const [gradeCounts, setGradeCounts] = useState({});
     const [loading, setLoading] = useState(true);
 
-    // Initial data fetch and Real-time listener
     useEffect(() => {
-        const fetchStudents = async () => {
+        const fetchCounts = async () => {
             try {
-                // Axios call to the deployed backend
-                const res = await axios.get(`${BASE_URL}/api/students`); 
-                setStudents(res.data);
+                const res = await axios.get(`${BASE_URL}/api/students/counts`);
+                setGradeCounts(res.data);
                 setLoading(false);
             } catch (err) {
-                console.error('Error fetching students:', err);
+                console.error('Error fetching counts:', err);
+                setLoading(false);
             }
         };
-        fetchStudents();
 
-        // Listen for real-time updates from the backend
-        socket.on('students_updated', (updatedStudents) => {
-            setStudents(updatedStudents);
+        fetchCounts();
+
+        // Listen for real-time updates
+        socket.on('counts_updated', (updatedCounts) => {
+            setGradeCounts(updatedCounts);
         });
 
-        // Cleanup function
         return () => {
-            socket.off('students_updated');
+            socket.off('counts_updated');
         };
     }, []);
 
-    // Filtering logic (Search Bar)
-    const filteredStudents = useMemo(() => {
-        if (!searchTerm) return students;
-        return students.filter(student =>
-            student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [students, searchTerm]);
+    // Authorization Check - Home Dashboard එකට Login අවශ්‍ය නොවේ නම් මෙය ඉවත් කරන්න
+    // if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
+    //     return <p>🔒 Access Denied. Please log in as admin.</p>;
+    // }
 
-    // Grouping students by Grade
-    const studentsByGrade = filteredStudents.reduce((acc, student) => {
-        if (!acc[student.grade]) {
-            acc[student.grade] = [];
-        }
-        acc[student.grade].push(student);
-        return acc;
-    }, {});
-
-    if (loading) return <div style={{textAlign: 'center', padding: '50px'}}>Loading Student Data...</div>;
+    if (loading) return <div>Loading Dashboard...</div>;
 
     return (
         <div style={styles.container}>
-            <h1>🏫 Student Registration Home Dashboard</h1>
-            
-            {/* Search Bar */}
-            <input
-                type="text"
-                placeholder="🔎 Search by Student Name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={styles.searchBar}
-            />
+            <div style={styles.header}>
+                <h1>📚 ශිෂ්‍ය තොරතුරු ක්ෂණික වාර්තාව</h1>
+                {/* 🛑 Home Dashboard එකට Login අවශ්‍ය නම් පමණක් පහත බොත්තම තබන්න */}
+                {/* <button onClick={onLogout} style={styles.logoutButton}>Logout</button> */}
+            </div>
 
-            {/* Display Students by Grade */}
-            {GRADES.map(grade => (
-                <div key={grade} style={styles.gradeSection}>
-                    <h2>{grade} - Registered ({studentsByGrade[grade]?.length || 0})</h2>
-                    <div style={styles.studentGrid}>
-                        {studentsByGrade[grade]?.length > 0 ? (
-                            studentsByGrade[grade].map(student => (
-                                <StudentCard key={student._id} student={student} />
-                            ))
-                        ) : (
-                            <p>No students registered for this grade yet.</p>
-                        )}
-                    </div>
-                </div>
-            ))}
+            <div style={styles.gradeGrid}>
+                {GRADES.map(grade => {
+                    const count = gradeCounts[grade] || 0;
+                    const color = GRADE_COLORS[grade];
+
+                    return (
+                        <div key={grade} style={{...styles.gradeCard, backgroundColor: color}}>
+                            <h3 style={styles.gradeName}>{grade}</h3>
+                            <p style={styles.studentCount}>ශිෂ්‍ය සංඛ්‍යාව:</p>
+                            <div style={styles.countCircle}>
+                                <span>{count}</span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div style={styles.totalCount}>
+                <h2>මුළු ශිෂ්‍ය සංඛ්‍යාව: {Object.values(gradeCounts).reduce((sum, count) => sum + count, 0)}</h2>
+            </div>
+            
         </div>
     );
 };
 
-// Basic Styling (same as before)
+// ✨ නවීන සහ අලංකාර විලාසිතා (Styles) ✨
 const styles = {
-    container: { padding: '20px' },
-    searchBar: { padding: '12px', width: '100%', maxWidth: '600px', margin: '20px 0', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' },
-    gradeSection: { marginBottom: '30px', padding: '15px', borderLeft: '5px solid #ffc107', backgroundColor: '#fffbe6' },
-    studentGrid: { display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '15px' },
+    container: {
+        padding: '40px 20px',
+        backgroundColor: '#f0f2f5', // Light background
+        minHeight: '100vh',
+    },
+    header: {
+        textAlign: 'center',
+        marginBottom: '40px',
+        color: '#333',
+    },
+    gradeGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', // Responsive Grid
+        gap: '30px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+    },
+    // 🛑 Grade Card Styles - අලංකාර කිරීම
+    gradeCard: {
+        padding: '25px',
+        borderRadius: '15px', // Rounded corners
+        color: '#333',
+        textAlign: 'center',
+        cursor: 'default',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+        boxShadow: '0 10px 20px rgba(0, 0, 0, 0.15)', // Default shadow
+        position: 'relative',
+        overflow: 'hidden',
+        // Hover Effect සඳහා CSS නොවන JavaScript Style
+        // මෙය React Style එකක් බැවින්, සැබෑ Hover effect එකක් සඳහා
+        // Card එකට වෙනම component එකක් අවශ්‍ය වේ, නමුත් අපි සරලව තබමු.
+        // සටහන: සැබෑ hover effect මෙහිදී ක්‍රියාත්මක වන්නේ නැත, නමුත් අපි පෙනුම වැඩි දියුණු කර ඇත.
+    },
+    gradeName: {
+        fontSize: '1.8em',
+        fontWeight: '700',
+        marginBottom: '10px',
+        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.1)',
+        color: '#333', // Text color for contrast
+    },
+    studentCount: {
+        fontSize: '1em',
+        color: '#555',
+        marginBottom: '15px',
+        fontWeight: '500',
+    },
+    countCircle: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '80px',
+        height: '80px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(255, 255, 255, 0.85)', // White/Transparent center
+        color: '#000',
+        fontSize: '2em',
+        fontWeight: '900',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)', // Circle shadow
+    },
+    totalCount: {
+        textAlign: 'center',
+        marginTop: '50px',
+        padding: '20px',
+        backgroundColor: '#fff',
+        maxWidth: '400px',
+        margin: '50px auto 0 auto',
+        borderRadius: '10px',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+    },
+    logoutButton: { 
+        // Admin Dashboard Style
+        position: 'absolute', 
+        top: '30px', 
+        right: '30px', 
+        padding: '10px 18px', 
+        backgroundColor: '#FF6347', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '25px', 
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+    },
 };
 
 export default HomeDashboard;

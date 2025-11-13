@@ -18,7 +18,7 @@ const initialStudentState = {
     parentNameFather: '',
     parentNameMother: '',
     contactNumber: '',
-    studentPhoto: '', // 🛑 මෙය නැවත URL එකක් ලෙස සලකනු ලැබේ
+    studentPhoto: '', 
     notes: ''
 };
 
@@ -28,7 +28,6 @@ const AdminDashboard = ({ onLogout }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
-    // 🛑 Direct File Upload සඳහා තිබූ selectedFile state එක ඉවත් කර ඇත.
 
     // 1. Initial Data Fetch and Real-time Listener
     useEffect(() => {
@@ -67,18 +66,16 @@ const AdminDashboard = ({ onLogout }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // 🛑 දැන් අපි නැවත සාමාන්‍ය JSON දත්ත යවමු
+        // සාමාන්‍ය JSON දත්ත යවමු
         const dataToSend = { ...formData };
 
         try {
             if (isEditing) {
                 // UPDATE operation (PUT)
-                // 🛑 multipart/form-data Headers ඉවත් කර ඇත
                 await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
                 alert('Student data updated successfully! (Real-time update triggered)');
             } else {
                 // CREATE operation (POST)
-                // 🛑 multipart/form-data Headers ඉවත් කර ඇත
                 await axios.post(`${BASE_URL}/api/students`, dataToSend); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
@@ -96,7 +93,6 @@ const AdminDashboard = ({ onLogout }) => {
         setFormData(initialStudentState);
         setIsEditing(false);
         setEditingId(null);
-        // 🛑 selectedFile reset කිරීමේ අවශ්‍යතාවක් නැත
     };
 
     // Set up form for editing an existing student
@@ -165,25 +161,25 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Contact Number:</label>
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     
-                    {/* 🛑 Student Photo URL Input with Helper Button */}
+                    {/* 🛑 Student Photo URL Input with Catbox.moe Helper Button */}
                     <label>Student Photo URL:</label> 
                     <div style={styles.urlInputContainer}> 
                         <input 
-                            type="text" // 🛑 මෙය type="text" යි
+                            type="text" 
                             name="studentPhoto" 
                             value={formData.studentPhoto} 
                             onChange={handleChange} 
-                            style={{...styles.inputField, flexGrow: 1}} // Input එකට වැඩි ඉඩක්
-                            placeholder="Paste Image URL here (e.g., from Imgur, Postimages)"
+                            style={{...styles.inputField, flexGrow: 1}} 
+                            placeholder="Paste Image URL here (e.g., from Catbox.moe)" // 🛑 වෙනස් කර ඇත
                         />
                         <button 
                             type="button" 
-                            onClick={() => window.open('https://imgur.com/upload', '_blank')} 
+                            // 🛑 සබැඳිය Catbox.moe වෙත වෙනස් කර ඇත
+                            onClick={() => window.open('https://catbox.moe/', '_blank')} 
                             style={styles.uploadHelperButton}>
                             ⬆️ Upload Helper
                         </button>
                     </div>
-                    {/* 🛑 ගොනු Input එකට අදාළ කොන්දේසි සහිත p tag එක ඉවත් කර ඇත */}
                     
                     <label>Notes:</label>
                     <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>

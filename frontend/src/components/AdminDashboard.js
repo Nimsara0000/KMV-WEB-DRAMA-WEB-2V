@@ -139,31 +139,32 @@ const AdminDashboard = ({ onLogout }) => {
                 <h2>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields (same as before) */}
+                    {/* Input Fields (styles.inputField එකතු කරන්න) */}
                     <label>Full Name:</label>
-                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required />
+                    <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
                     
                     <label>Date of Birth:</label>
-                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} required />
+                    <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} style={styles.inputField} required />
                     
                     <label>Grade:</label>
-                    <select name="grade" value={formData.grade} onChange={handleChange} required>
+                    <select name="grade" value={formData.grade} onChange={handleChange} style={styles.inputField} required>
                         {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                     </select>
 
                     <label>Father's Name:</label>
-                    <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} required />
+                    <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={styles.inputField} required />
                     <label>Mother's Name:</label>
-                    <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} required />
+                    <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={styles.inputField} required />
                     
                     <label>Contact Number:</label>
-                    <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} required />
+                    <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     
+                    {/* 🛑 Photo URL එකට inputField යොදා ඇත */}
                     <label>Student Photo URL:</label> 
-                    <input type="text" name="studentPhoto" value={formData.studentPhoto} onChange={handleChange} />
+                    <input type="text" name="studentPhoto" value={formData.studentPhoto} onChange={handleChange} style={styles.inputField} />
                     
                     <label>Notes:</label>
-                    <textarea name="notes" value={formData.notes} onChange={handleChange}></textarea>
+                    <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>
                     
                     <button type="submit" style={isEditing ? styles.updateButton : styles.submitButton}>
                         {isEditing ? 'Update Details' : 'Register Student'}
@@ -178,12 +179,12 @@ const AdminDashboard = ({ onLogout }) => {
 
             <hr style={{ margin: '40px 0', border: '1px dashed #ccc' }} />
 
-            {/* --- Student List for Editing/Deleting (same as before) --- */}
+            {/* --- Student List for Editing/Deleting --- */}
             <h2>📋 Current Registered Students</h2>
             <div style={styles.studentList}>
                 {students.map(student => (
                     <div key={student._id} style={styles.studentItem}>
-                        <img src={student.studentPhoto || 'https://via.placeholder.com/50?text=P'} alt={student.fullName} style={styles.photo} />
+                        <img src={student.studentPhoto || 'https://via.placeholder.com/60?text=P'} alt={student.fullName} style={styles.photo} />
                         <div style={styles.details}>
                             <strong>{student.fullName}</strong> - {student.grade}
                             <p style={{margin: 0, fontSize: '0.9em', color: '#555'}}>Contact: {student.contactNumber}</p>
@@ -199,22 +200,129 @@ const AdminDashboard = ({ onLogout }) => {
     );
 };
 
-// Basic Styling (same as before)
+// ✨ වැඩි දියුණු කළ විලාසිතා (Styles) ✨
 const styles = {
-    container: { padding: '20px', position: 'relative' },
-    logoutButton: { position: 'absolute', top: '20px', right: '20px', padding: '10px 15px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' },
-    formSection: { padding: '20px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '30px', backgroundColor: '#f9f9f9' },
-    formContainer: { display: 'grid', gridTemplateColumns: '150px 1fr', gap: '10px 20px', maxWidth: '800px', margin: '0 auto', padding: '15px' },
-    submitButton: { gridColumn: '1 / 3', padding: '12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '15px' },
-    updateButton: { gridColumn: '1 / 3', padding: '12px', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '15px' },
-    cancelButton: { gridColumn: '1 / 3', padding: '12px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '5px' },
-    studentList: { marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' },
-    studentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px', border: '1px solid #e9ecef', borderRadius: '5px', backgroundColor: 'white' },
-    photo: { width: '50px', height: '50px', borderRadius: '50%', marginRight: '15px', objectFit: 'cover' },
-    details: { flexGrow: 1 },
-    actions: { display: 'flex', gap: '10px' },
-    editButton: { backgroundColor: '#007bff', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' },
-    deleteButton: { backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer' },
+    container: { 
+        padding: '30px', 
+        position: 'relative',
+        backgroundColor: 'white', 
+        borderRadius: '12px',
+    },
+    logoutButton: { 
+        position: 'absolute', 
+        top: '30px', 
+        right: '30px', 
+        padding: '10px 18px', 
+        backgroundColor: '#FF6347', // Tomato Red
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '25px', 
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+    },
+    formSection: { 
+        padding: '30px', 
+        border: '1px solid #e0e0e0', 
+        borderRadius: '10px', 
+        marginBottom: '40px', 
+        backgroundColor: '#f9f9ff', // Very light blue/purple tint
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+    },
+    formContainer: { 
+        display: 'grid', 
+        gridTemplateColumns: '150px 1fr', 
+        gap: '15px 30px', 
+        maxWidth: '800px', 
+        margin: '20px auto', 
+        padding: '15px' 
+    },
+    // Input/Select/Textarea සඳහා පොදු විලාසිතාව
+    inputField: { 
+        padding: '10px', 
+        border: '1px solid #ccc', 
+        borderRadius: '6px', 
+        fontSize: '1em',
+        boxSizing: 'border-box',
+    },
+    
+    // බොත්තම් සඳහා පොදු විලාසිතාව
+    formButton: {
+        gridColumn: '1 / 3', 
+        padding: '12px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        marginTop: '15px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    },
+    submitButton: { 
+        backgroundColor: '#28a745', // Green 
+        color: 'white', 
+        ...this.formButton
+    },
+    updateButton: { 
+        backgroundColor: '#1E90FF', // Blue for Update
+        color: 'white', 
+        ...this.formButton
+    },
+    cancelButton: { 
+        backgroundColor: '#6c757d', 
+        color: 'white', 
+        marginTop: '5px',
+        ...this.formButton
+    },
+    studentList: { 
+        marginTop: '20px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '15px' 
+    },
+    studentItem: { 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        padding: '15px', 
+        border: '1px solid #eee', 
+        borderRadius: '8px', 
+        backgroundColor: '#f9f9f9',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+    },
+    photo: { 
+        width: '60px', 
+        height: '60px', 
+        borderRadius: '50%', 
+        marginRight: '20px', 
+        objectFit: 'cover',
+        border: '3px solid #1E90FF', 
+    },
+    details: { 
+        flexGrow: 1 
+    },
+    actions: { 
+        display: 'flex', 
+        gap: '10px' 
+    },
+    // Edit/Delete list buttons
+    listButton: {
+        border: 'none', 
+        padding: '8px 12px', 
+        borderRadius: '25px', // Rounded buttons
+        cursor: 'pointer',
+        fontWeight: 'bold',
+    },
+    editButton: { 
+        backgroundColor: '#ffc107', 
+        color: 'black',
+        ...this.listButton
+    },
+    deleteButton: { 
+        backgroundColor: '#dc3545', 
+        color: 'white', 
+        ...this.listButton
+    },
 };
 
 export default AdminDashboard;

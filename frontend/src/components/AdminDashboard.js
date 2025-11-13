@@ -170,11 +170,10 @@ const AdminDashboard = ({ onLogout }) => {
                             value={formData.studentPhoto} 
                             onChange={handleChange} 
                             style={{...styles.inputField, flexGrow: 1}} 
-                            placeholder="Paste Image URL here (e.g., from Catbox.moe)" // 🛑 වෙනස් කර ඇත
+                            placeholder="Paste Image URL here (e.g., from Catbox.moe)" 
                         />
                         <button 
                             type="button" 
-                            // 🛑 සබැඳිය Catbox.moe වෙත වෙනස් කර ඇත
                             onClick={() => window.open('https://catbox.moe/', '_blank')} 
                             style={styles.uploadHelperButton}>
                             ⬆️ Upload Helper
@@ -184,20 +183,23 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Notes:</label>
                     <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>
                     
-                    <button type="submit" style={isEditing ? styles.updateButton : styles.submitButton}>
-                        {isEditing ? 'Update Details' : 'Register Student'}
-                    </button>
-                    {isEditing && (
-                        <button type="button" onClick={resetForm} style={styles.cancelButton}>
-                            Cancel Edit
+                    {/* 🛑 Buttons Group (සමබරතාවය සඳහා) */}
+                    <div style={styles.buttonGroup}>
+                        {isEditing && (
+                            <button type="button" onClick={resetForm} style={styles.cancelButton}>
+                                Cancel Edit
+                            </button>
+                        )}
+                        <button type="submit" style={isEditing ? styles.updateButton : styles.submitButton}>
+                            {isEditing ? 'Update Details' : 'Register Student'}
                         </button>
-                    )}
+                    </div>
                 </form>
             </div>
 
             <hr style={{ margin: '40px 0', border: '1px dashed #ccc' }} />
 
-            {/* --- Student List for Editing/Deleting --- */}
+            {/* --- Student List for Editing/Deleting (සමබරතාවය වැඩි දියුණු කළ) --- */}
             <h2>📋 Current Registered Students</h2>
             <div style={styles.studentList}>
                 {students.map(student => (
@@ -249,11 +251,12 @@ const styles = {
     },
     formContainer: { 
         display: 'grid', 
-        gridTemplateColumns: '150px 1fr', 
+        // 🛑 සමබරතාවය සඳහා වෙනස් කර ඇත
+        gridTemplateColumns: '180px 1fr', 
         gap: '15px 30px', 
-        maxWidth: '800px', 
+        maxWidth: '900px', // 🛑 පළල වැඩි කර ඇත
         margin: '20px auto', 
-        padding: '15px' 
+        padding: '20px' 
     },
     // Input/Select/Textarea සඳහා පොදු විලාසිතාව
     inputField: { 
@@ -264,7 +267,7 @@ const styles = {
         boxSizing: 'border-box',
     },
     
-    // 🛑 නව Styles: URL Input එක සහ බොත්තම එකට තැබීමට
+    // URL Input එක සහ බොත්තම
     urlInputContainer: {
         gridColumn: '2 / 3',
         display: 'flex',
@@ -280,31 +283,28 @@ const styles = {
         cursor: 'pointer',
         fontWeight: 'bold',
         transition: 'background-color 0.3s ease',
-        whiteSpace: 'nowrap', // බොත්තමේ වචන කැඩී යාම වලකයි
-        height: '40px', // Input එකේ උසට සකස් කිරීමට
+        whiteSpace: 'nowrap', 
+        height: '40px', 
     },
     
-    // බොත්තම් සඳහා මූලික විලාසිතාව
-    baseButton: {
-        gridColumn: '1 / 3', 
-        padding: '12px', 
-        border: 'none', 
-        borderRadius: '8px', 
-        cursor: 'pointer', 
+    // 🛑 නව Buttons Group Wrapper එක
+    buttonGroup: {
+        gridColumn: '2 / 3', // දෙවන තීරුවට සීමා කර ඇත
+        display: 'flex',
+        justifyContent: 'flex-end', // දකුණට ගෙන යන්න
+        gap: '15px',
         marginTop: '15px',
-        fontWeight: 'bold',
-        transition: 'background-color 0.3s ease',
-        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+        alignItems: 'center',
     },
+
+    // බොත්තම් සඳහා විලාසිතාව
     submitButton: { 
         backgroundColor: '#28a745', // Green 
         color: 'white', 
-        gridColumn: '1 / 3', 
-        padding: '12px', 
+        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
-        marginTop: '15px',
         fontWeight: 'bold',
         transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -312,12 +312,10 @@ const styles = {
     updateButton: { 
         backgroundColor: '#1E90FF', // Blue for Update
         color: 'white', 
-        gridColumn: '1 / 3', 
-        padding: '12px', 
+        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
-        marginTop: '15px',
         fontWeight: 'bold',
         transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
@@ -325,9 +323,7 @@ const styles = {
     cancelButton: { 
         backgroundColor: '#6c757d', 
         color: 'white', 
-        marginTop: '5px',
-        gridColumn: '1 / 3', 
-        padding: '12px', 
+        padding: '12px 25px', // 🛑 Padding වැඩි කර ඇත
         border: 'none', 
         borderRadius: '8px', 
         cursor: 'pointer', 
@@ -335,6 +331,8 @@ const styles = {
         transition: 'background-color 0.3s ease',
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
     },
+    
+    // 🛑 Student List Styles (සමබරතාවය වැඩි දියුණු කළ)
     studentList: { 
         marginTop: '20px', 
         display: 'flex', 
@@ -345,11 +343,11 @@ const styles = {
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between', 
-        padding: '15px', 
+        padding: '15px 20px', // 🛑 Padding වෙනස් කර ඇත
         border: '1px solid #eee', 
         borderRadius: '8px', 
-        backgroundColor: '#f9f9f9',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+        backgroundColor: '#fff', // සුදු පසුබිමක්
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', // 🛑 සෙවනැල්ලක් වැඩි කර ඇත
     },
     photo: { 
         width: '60px', 
@@ -360,20 +358,12 @@ const styles = {
         border: '3px solid #1E90FF', 
     },
     details: { 
-        flexGrow: 1 
+        flexGrow: 1,
+        marginLeft: '15px', // Photo එකට පසු කුඩා ඉඩක්
     },
     actions: { 
         display: 'flex', 
-        gap: '10px' 
-    },
-    // Edit/Delete list buttons
-    listButtonBase: {
-        border: 'none', 
-        padding: '8px 12px', 
-        borderRadius: '25px', // Rounded buttons
-        cursor: 'pointer',
-        fontWeight: 'bold',
-        transition: 'all 0.3s ease',
+        gap: '12px' // Buttons අතර දුර වැඩි කර ඇත
     },
     editButton: { 
         backgroundColor: '#ffc107', 

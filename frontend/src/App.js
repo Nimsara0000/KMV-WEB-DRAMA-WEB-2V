@@ -41,12 +41,13 @@ function App() {
         <div className="App" style={styles.appContainer}>
             <header style={styles.header}>
                 <h1>KMV SCHOOL DRAMA REGISTRATIONS</h1>
-                <nav>
+                {/* 🛑 nav element එක display: flex; ලෙස ක්‍රියා කරන නිසා බොත්තම් හරහට පවතී */}
+                <nav style={styles.navBar}>
                     <button onClick={() => setCurrentPage('home')} style={styles.navButton}>Home</button>
                     {isAdminLoggedIn ? (
                         <>
                             <button onClick={() => setCurrentPage('admin')} style={styles.navButton}>Admin Panel</button>
-                            {/* 🛑 Logout බොත්තමට styles.navButtonLogout යොදා ඇත */}
+                            {/* Logout බොත්තම වෙනත් style එකකින් */}
                             <button onClick={handleLogout} style={styles.navButtonLogout}>Logout</button>
                         </>
                     ) : (
@@ -61,11 +62,11 @@ function App() {
     );
 }
 
-// ✨ යාවත්කාලීන කළ විලාසිතා ✨
+// ✨ යාවත්කාලීන කළ විලාසිතා (Styles) ✨
 const styles = {
     appContainer: {
         fontFamily: 'Roboto, Arial, sans-serif',
-        // 'index.css' මගින් පසුබිම පාලනය කරයි (Gradient)
+        // පසුබිම index.css මගින් පාලනය කරයි (Gradient)
         backgroundColor: 'transparent', 
         minHeight: '100vh',
     },
@@ -76,15 +77,19 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // වඩාත් කැපී පෙනෙන සෙවණැල්ල
+        // කැපී පෙනෙන සෙවණැල්ල
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)', 
+    },
+    navBar: {
+        // බොත්තම් හරහට තබා ගැනීමට (navBar එකක් ලෙස)
+        display: 'flex',
+        gap: '15px', // බොත්තම් අතර ඉඩ
     },
     // Home සහ Admin Panel බොත්තම් සඳහා
     navButton: {
-        marginLeft: '15px',
         padding: '10px 18px',
         backgroundColor: 'white',
-        color: '#1E90FF', // Button text color matches header
+        color: '#1E90FF', 
         border: '2px solid white', 
         borderRadius: '25px', // Rounded buttons
         cursor: 'pointer',
@@ -93,7 +98,6 @@ const styles = {
     },
     // Logout බොත්තම සඳහා (වෙනස් වර්ණයකින් කැපී පෙනීමට)
     navButtonLogout: {
-        marginLeft: '15px',
         padding: '10px 18px',
         backgroundColor: '#FF6347', // Tomato Red
         color: 'white',

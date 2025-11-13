@@ -20,14 +20,16 @@ const LoginPage = ({ onLoginSuccess }) => {
                 onLoginSuccess();
             }
         } catch (err) {
-            setError('Login Failed. Check the email (nimanimaowner@gmail.com).');
+            // 🛑 Error message එකේ ඇති email එක ඉවත් කර ඇත
+            setError('Login Failed. Check the email provided.');
         }
     };
 
     return (
         <div style={styles.container}>
-            <h2>🔑 Admin Login</h2>
-            <p>Use: <strong>nimanimaowner@gmail.com</strong></p>
+            <h2>🔐 Admin Login</h2>
+            {/* 🛑 මෙහි පණිවිඩය "Use: admin only gmail" ලෙස වෙනස් කර ඇත */}
+            <p style={styles.infoText}>Use: <strong>admin only gmail</strong></p>
             <form onSubmit={handleSubmit} style={styles.form}>
                 <input
                     type="email"
@@ -44,12 +46,53 @@ const LoginPage = ({ onLoginSuccess }) => {
     );
 };
 
+// ✨ වැඩි දියුණු කළ විලාසිතා ✨
 const styles = {
-    container: { maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' },
-    form: { display: 'flex', flexDirection: 'column', gap: '15px' },
-    input: { padding: '10px', border: '1px solid #ccc', borderRadius: '4px' },
-    button: { padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
-    error: { color: 'red', marginTop: '10px' }
+    container: { 
+        maxWidth: '400px', 
+        margin: '80px auto', 
+        padding: '30px', 
+        backgroundColor: 'white', 
+        border: 'none', 
+        borderRadius: '15px', 
+        boxShadow: '0 10px 30px rgba(0,0,0,0.15)', 
+        textAlign: 'center',
+    },
+    infoText: {
+        // 🛑 මෙහි වර්ණය වෙනස් කර ඇත
+        color: '#1E90FF', 
+        marginBottom: '20px',
+        fontSize: '1em',
+        fontWeight: 'bold', // වඩාත් කැපී පෙනීමට
+    },
+    form: { 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '20px' 
+    },
+    input: { 
+        padding: '12px', 
+        border: '1px solid #ccc', 
+        borderRadius: '8px', 
+        fontSize: '1em',
+    },
+    button: { 
+        padding: '12px', 
+        backgroundColor: '#1E90FF', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer',
+        fontSize: '1em',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', 
+    },
+    error: { 
+        color: '#FF6347', 
+        marginTop: '15px',
+        fontWeight: 'bold',
+    }
 };
 
 export default LoginPage;

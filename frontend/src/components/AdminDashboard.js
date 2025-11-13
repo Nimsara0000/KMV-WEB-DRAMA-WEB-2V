@@ -28,6 +28,7 @@ const AdminDashboard = ({ onLogout }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedFile, setSelectedFile] = useState(null); // 🛑 නව State එක
 
     // 1. Initial Data Fetch and Real-time Listener
     useEffect(() => {
@@ -56,25 +57,55 @@ const AdminDashboard = ({ onLogout }) => {
         };
     }, []);
 
-    // Handle form input changes
+    // Handle form input changes (for text/select inputs)
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+    
+    // Handle file input changes (for file input)
+    const handleFileChange = (e) => {
+        setSelectedFile(e.target.files[0]); // තෝරාගත් ගොනුව ගබඩා කරයි
     };
 
     // 2. Handle Form Submission (Create or Update)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const dataToSend = { ...formData };
+        
+        // 🛑 FormData භාවිතා කිරීම: මෙය ගොනු යැවීමට අත්‍යවශ්‍යයි!
+        const formDataToSend = new FormData();
+        
+        // සාමාන්‍ය දත්ත එකතු කිරීම
+        for (const key in formData) {
+            // studentPhoto හැර අනෙකුත් දත්ත එකතු කරයි
+            if (key !== 'studentPhoto') {
+                formDataToSend.append(key, formData[key]);
+            }
+        }
+        
+        // 🛑 ගොනුව (File) එකතු කිරීම
+        if (selectedFile) {
+            formDataToSend.append('studentPhoto', selectedFile); 
+        } else if (isEditing) {
+            // Edit කරන විට නව ගොනුවක් නොදෙන්නේ නම්, පවතින URL එක නැවත යවයි.
+            formDataToSend.append('studentPhoto', formData.studentPhoto || ''); 
+        }
+        
+        // නව ලියාපදිංචියකදී ගොනුවක්/URL එකක් නොමැති නම්, හිස් අගය යවනු ඇත.
 
         try {
+            let res;
             if (isEditing) {
                 // UPDATE operation (PUT)
-                await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
+                res = await axios.put(`${BASE_URL}/api/students/${editingId}`, formDataToSend, {
+                    headers: { 'Content-Type': 'multipart/form-data' } // 🛑 අත්‍යවශ්‍යයි
+                }); 
                 alert('Student data updated successfully! (Real-time update triggered)');
             } else {
                 // CREATE operation (POST)
-                await axios.post(`${BASE_URL}/api/students`, dataToSend); 
+                res = await axios.post(`${BASE_URL}/api/students`, formDataToSend, {
+                    headers: { 'Content-Type': 'multipart/form-data' } // 🛑 අත්‍යවශ්‍යයි
+                }); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
             
@@ -91,6 +122,7 @@ const AdminDashboard = ({ onLogout }) => {
         setFormData(initialStudentState);
         setIsEditing(false);
         setEditingId(null);
+        setSelectedFile(null); // 🛑 ගොනුව ද Reset කරන්න
     };
 
     // Set up form for editing an existing student
@@ -103,6 +135,7 @@ const AdminDashboard = ({ onLogout }) => {
         });
         setEditingId(student._id);
         setIsEditing(true);
+        setSelectedFile(null); // Edit කිරීම ආරම්භයේදී ගොනු තේරීම ඉවත් කරන්න
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -139,7 +172,7 @@ const AdminDashboard = ({ onLogout }) => {
                 <h2>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields වලට styles.inputField යොදා ඇත */}
+                    {/* Input Fields (text, date, select) */}
                     <label>Full Name:</label>
                     <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
                     
@@ -159,8 +192,20 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Contact Number:</label>
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     
-                    <label>Student Photo URL:</label> 
-                    <input type="text" name="studentPhoto" value={formData.studentPhoto} onChange={handleChange} style={styles.inputField} />
+                    {/* 🛑 ගොනු Input එක (File Input) */}
+                    <label>Student Photo:</label> 
+                    <input 
+                        type="file" // 🛑 මෙය type="file" ලෙස වෙනස් කර ඇත
+                        name="studentPhoto" 
+                        onChange={handleFileChange} // 🛑 නව handler එක
+                        style={styles.fileInputField} // 🛑 නව Style එක
+                        accept="image/*" // රූප පමණක් තෝරා ගැනීමට
+                    />
+                    {isEditing && formData.studentPhoto && !selectedFile && (
+                        <p style={{gridColumn: '2 / 3', margin: '0 0 10px 0', fontSize: '0.9em', color: '#1E90FF'}}>
+                            Current Photo: <a href={formData.studentPhoto} target="_blank" rel="noopener noreferrer">View Existing Photo</a>
+                        </p>
+                    )}
                     
                     <label>Notes:</label>
                     <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>
@@ -199,7 +244,7 @@ const AdminDashboard = ({ onLogout }) => {
     );
 };
 
-// ✨ නිවැරදි කළ විලාසිතා (Styles) ✨
+// ✨ යාවත්කාලීන කළ විලාසිතා (Styles) ✨
 const styles = {
     container: { 
         padding: '30px', 
@@ -244,6 +289,13 @@ const styles = {
         fontSize: '1em',
         boxSizing: 'border-box',
     },
+    // 🛑 නව File Input Style එක
+    fileInputField: {
+        padding: '8px 0',
+        fontSize: '1em',
+        boxSizing: 'border-box',
+        // File input button style කිරීම අසීරු නිසා සරලව තබා ඇත.
+    },
     
     // බොත්තම් සඳහා මූලික විලාසිතාව
     baseButton: {
@@ -260,7 +312,6 @@ const styles = {
     submitButton: { 
         backgroundColor: '#28a745', // Green 
         color: 'white', 
-        // 🛑 baseButton එක manually apply කර ඇත (error fix)
         gridColumn: '1 / 3', 
         padding: '12px', 
         border: 'none', 
@@ -274,7 +325,6 @@ const styles = {
     updateButton: { 
         backgroundColor: '#1E90FF', // Blue for Update
         color: 'white', 
-        // 🛑 baseButton එක manually apply කර ඇත (error fix)
         gridColumn: '1 / 3', 
         padding: '12px', 
         border: 'none', 
@@ -289,7 +339,6 @@ const styles = {
         backgroundColor: '#6c757d', 
         color: 'white', 
         marginTop: '5px',
-        // 🛑 baseButton එක manually apply කර ඇත (error fix)
         gridColumn: '1 / 3', 
         padding: '12px', 
         border: 'none', 
@@ -342,7 +391,6 @@ const styles = {
     editButton: { 
         backgroundColor: '#ffc107', 
         color: 'black',
-        // listButtonBase properties
         border: 'none', 
         padding: '8px 12px', 
         borderRadius: '25px', 
@@ -353,7 +401,6 @@ const styles = {
     deleteButton: { 
         backgroundColor: '#dc3545', 
         color: 'white', 
-        // listButtonBase properties
         border: 'none', 
         padding: '8px 12px', 
         borderRadius: '25px', 

@@ -18,7 +18,7 @@ const initialStudentState = {
     parentNameFather: '',
     parentNameMother: '',
     contactNumber: '',
-    studentPhoto: '', 
+    studentPhoto: '', // 🛑 මෙය නැවත URL එකක් ලෙස සලකනු ලැබේ
     notes: ''
 };
 
@@ -28,7 +28,7 @@ const AdminDashboard = ({ onLogout }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [selectedFile, setSelectedFile] = useState(null); // 🛑 නව State එක
+    // 🛑 Direct File Upload සඳහා තිබූ selectedFile state එක ඉවත් කර ඇත.
 
     // 1. Initial Data Fetch and Real-time Listener
     useEffect(() => {
@@ -57,55 +57,29 @@ const AdminDashboard = ({ onLogout }) => {
         };
     }, []);
 
-    // Handle form input changes (for text/select inputs)
+    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-    };
-    
-    // Handle file input changes (for file input)
-    const handleFileChange = (e) => {
-        setSelectedFile(e.target.files[0]); // තෝරාගත් ගොනුව ගබඩා කරයි
     };
 
     // 2. Handle Form Submission (Create or Update)
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // 🛑 FormData භාවිතා කිරීම: මෙය ගොනු යැවීමට අත්‍යවශ්‍යයි!
-        const formDataToSend = new FormData();
-        
-        // සාමාන්‍ය දත්ත එකතු කිරීම
-        for (const key in formData) {
-            // studentPhoto හැර අනෙකුත් දත්ත එකතු කරයි
-            if (key !== 'studentPhoto') {
-                formDataToSend.append(key, formData[key]);
-            }
-        }
-        
-        // 🛑 ගොනුව (File) එකතු කිරීම
-        if (selectedFile) {
-            formDataToSend.append('studentPhoto', selectedFile); 
-        } else if (isEditing) {
-            // Edit කරන විට නව ගොනුවක් නොදෙන්නේ නම්, පවතින URL එක නැවත යවයි.
-            formDataToSend.append('studentPhoto', formData.studentPhoto || ''); 
-        }
-        
-        // නව ලියාපදිංචියකදී ගොනුවක්/URL එකක් නොමැති නම්, හිස් අගය යවනු ඇත.
+        // 🛑 දැන් අපි නැවත සාමාන්‍ය JSON දත්ත යවමු
+        const dataToSend = { ...formData };
 
         try {
-            let res;
             if (isEditing) {
                 // UPDATE operation (PUT)
-                res = await axios.put(`${BASE_URL}/api/students/${editingId}`, formDataToSend, {
-                    headers: { 'Content-Type': 'multipart/form-data' } // 🛑 අත්‍යවශ්‍යයි
-                }); 
+                // 🛑 multipart/form-data Headers ඉවත් කර ඇත
+                await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
                 alert('Student data updated successfully! (Real-time update triggered)');
             } else {
                 // CREATE operation (POST)
-                res = await axios.post(`${BASE_URL}/api/students`, formDataToSend, {
-                    headers: { 'Content-Type': 'multipart/form-data' } // 🛑 අත්‍යවශ්‍යයි
-                }); 
+                // 🛑 multipart/form-data Headers ඉවත් කර ඇත
+                await axios.post(`${BASE_URL}/api/students`, dataToSend); 
                 alert('Student registered successfully! (Real-time update triggered)');
             }
             
@@ -122,7 +96,7 @@ const AdminDashboard = ({ onLogout }) => {
         setFormData(initialStudentState);
         setIsEditing(false);
         setEditingId(null);
-        setSelectedFile(null); // 🛑 ගොනුව ද Reset කරන්න
+        // 🛑 selectedFile reset කිරීමේ අවශ්‍යතාවක් නැත
     };
 
     // Set up form for editing an existing student
@@ -135,7 +109,6 @@ const AdminDashboard = ({ onLogout }) => {
         });
         setEditingId(student._id);
         setIsEditing(true);
-        setSelectedFile(null); // Edit කිරීම ආරම්භයේදී ගොනු තේරීම ඉවත් කරන්න
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -192,20 +165,25 @@ const AdminDashboard = ({ onLogout }) => {
                     <label>Contact Number:</label>
                     <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     
-                    {/* 🛑 ගොනු Input එක (File Input) */}
-                    <label>Student Photo:</label> 
-                    <input 
-                        type="file" // 🛑 මෙය type="file" ලෙස වෙනස් කර ඇත
-                        name="studentPhoto" 
-                        onChange={handleFileChange} // 🛑 නව handler එක
-                        style={styles.fileInputField} // 🛑 නව Style එක
-                        accept="image/*" // රූප පමණක් තෝරා ගැනීමට
-                    />
-                    {isEditing && formData.studentPhoto && !selectedFile && (
-                        <p style={{gridColumn: '2 / 3', margin: '0 0 10px 0', fontSize: '0.9em', color: '#1E90FF'}}>
-                            Current Photo: <a href={formData.studentPhoto} target="_blank" rel="noopener noreferrer">View Existing Photo</a>
-                        </p>
-                    )}
+                    {/* 🛑 Student Photo URL Input with Helper Button */}
+                    <label>Student Photo URL:</label> 
+                    <div style={styles.urlInputContainer}> 
+                        <input 
+                            type="text" // 🛑 මෙය type="text" යි
+                            name="studentPhoto" 
+                            value={formData.studentPhoto} 
+                            onChange={handleChange} 
+                            style={{...styles.inputField, flexGrow: 1}} // Input එකට වැඩි ඉඩක්
+                            placeholder="Paste Image URL here (e.g., from Imgur, Postimages)"
+                        />
+                        <button 
+                            type="button" 
+                            onClick={() => window.open('https://imgur.com/upload', '_blank')} 
+                            style={styles.uploadHelperButton}>
+                            ⬆️ Upload Helper
+                        </button>
+                    </div>
+                    {/* 🛑 ගොනු Input එකට අදාළ කොන්දේසි සහිත p tag එක ඉවත් කර ඇත */}
                     
                     <label>Notes:</label>
                     <textarea name="notes" value={formData.notes} onChange={handleChange} style={styles.inputField}></textarea>
@@ -289,12 +267,25 @@ const styles = {
         fontSize: '1em',
         boxSizing: 'border-box',
     },
-    // 🛑 නව File Input Style එක
-    fileInputField: {
-        padding: '8px 0',
-        fontSize: '1em',
-        boxSizing: 'border-box',
-        // File input button style කිරීම අසීරු නිසා සරලව තබා ඇත.
+    
+    // 🛑 නව Styles: URL Input එක සහ බොත්තම එකට තැබීමට
+    urlInputContainer: {
+        gridColumn: '2 / 3',
+        display: 'flex',
+        gap: '10px',
+        alignItems: 'center',
+    },
+    uploadHelperButton: {
+        padding: '10px 15px',
+        backgroundColor: '#FFA500', // Orange
+        color: 'white',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease',
+        whiteSpace: 'nowrap', // බොත්තමේ වචන කැඩී යාම වලකයි
+        height: '40px', // Input එකේ උසට සකස් කිරීමට
     },
     
     // බොත්තම් සඳහා මූලික විලාසිතාව

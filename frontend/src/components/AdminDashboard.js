@@ -132,11 +132,23 @@ const AdminDashboard = ({ onLogout }) => {
         </div>
     );
 
+    // Apply input field styling logic to include hover/focus effects
+    const inputStyle = {
+        ...styles.inputField,
+        // Define a way to apply focus style conditionally if not possible directly in the CSS-in-JS object
+        // For simplicity in this static object, the focus style is handled in the styles definition (using ':focus')
+    };
+
     return (
         <div style={styles.container}>
-            <header style={styles.header}>
+            <header style={{...styles.header, ...styles.headerShadow}}>
                 <h1>🔑 Admin Registration Dashboard</h1>
-                <button onClick={onLogout} style={styles.logoutButton}>
+                <button 
+                    onClick={onLogout} 
+                    style={styles.logoutButton}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.logoutButtonHover.backgroundColor}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.logoutButton.backgroundColor}
+                >
                     🚪 Logout
                 </button>
             </header>
@@ -150,7 +162,7 @@ const AdminDashboard = ({ onLogout }) => {
                     {/* Full Name */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Full Name:</label>
-                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
+                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={inputStyle} required />
                     </div>
                     {/* DOB - Changed to type="date" */}
                     <div style={styles.inputGroup}>
@@ -160,7 +172,7 @@ const AdminDashboard = ({ onLogout }) => {
                             name="dateOfBirth" 
                             value={formData.dateOfBirth} 
                             onChange={handleChange} 
-                            style={styles.inputField} 
+                            style={inputStyle} 
                             required 
                         />
                     </div>
@@ -168,24 +180,24 @@ const AdminDashboard = ({ onLogout }) => {
                     {/* Grade */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Grade:</label>
-                        <select name="grade" value={formData.grade} onChange={handleChange} style={styles.inputField} required>
+                        <select name="grade" value={formData.grade} onChange={handleChange} style={inputStyle} required>
                             {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                         </select>
                     </div>
                     {/* Contact Number */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Contact Number:</label>
-                        <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
+                        <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={inputStyle} required />
                     </div>
                     
                     {/* Parents' Names */}
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Father's Name:</label>
-                        <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={styles.inputField} required />
+                        <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={inputStyle} required />
                     </div>
                     <div style={styles.inputGroup}>
                         <label style={styles.label}>Mother's Name:</label>
-                        <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={styles.inputField} required />
+                        <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={inputStyle} required />
                     </div>
                     
                     {/* Photo URL (Full Width) */}
@@ -197,13 +209,16 @@ const AdminDashboard = ({ onLogout }) => {
                                 name="studentPhoto" 
                                 value={formData.studentPhoto} 
                                 onChange={handleChange} 
-                                style={{...styles.inputField, flexGrow: 1}} 
+                                style={{...inputStyle, flexGrow: 1}} 
                                 placeholder="Paste Image URL here" 
                             />
                             <button 
                                 type="button" 
                                 onClick={() => window.open('https://catbox.moe/', '_blank')} 
-                                style={styles.uploadHelperButton}>
+                                style={styles.uploadHelperButton}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.uploadHelperButtonHover.backgroundColor}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.uploadHelperButton.backgroundColor}
+                            >
                                 ⬆️ Upload Helper
                             </button>
                         </div>
@@ -224,16 +239,27 @@ const AdminDashboard = ({ onLogout }) => {
                     {/* Notes (Full Width) */}
                     <div style={styles.fullWidthGroup}>
                         <label style={styles.label}>Notes:</label>
-                        <textarea name="notes" value={formData.notes} onChange={handleChange} style={{...styles.inputField, minHeight: '80px'}}></textarea>
+                        <textarea name="notes" value={formData.notes} onChange={handleChange} style={{...inputStyle, minHeight: '80px'}}></textarea>
                     </div>
                     
                     <div style={styles.buttonGroup}>
                         {isEditing && (
-                            <button type="button" onClick={resetForm} style={styles.cancelButton}>
+                            <button 
+                                type="button" 
+                                onClick={resetForm} 
+                                style={styles.cancelButton}
+                                onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.cancelButtonHover.backgroundColor}
+                                onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.cancelButton.backgroundColor}
+                            >
                                 ❌ Cancel Edit
                             </button>
                         )}
-                        <button type="submit" style={isEditing ? styles.updateButton : styles.submitButton}>
+                        <button 
+                            type="submit" 
+                            style={isEditing ? styles.updateButton : styles.submitButton}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = isEditing ? styles.updateButtonHover.backgroundColor : styles.submitButtonHover.backgroundColor}
+                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = isEditing ? styles.updateButton.backgroundColor : styles.submitButton.backgroundColor}
+                        >
                             {isEditing ? '💾 Update Details' : '✅ Register Student'}
                         </button>
                     </div>
@@ -248,7 +274,11 @@ const AdminDashboard = ({ onLogout }) => {
                     <p style={styles.noData}>No student records found.</p>
                 ) : (
                     students.map(student => (
-                        <div key={student._id} style={styles.studentItem}>
+                        <div key={student._id} 
+                            style={styles.studentItem}
+                            onMouseOver={(e) => e.currentTarget.style.boxShadow = styles.studentItemHover.boxShadow}
+                            onMouseOut={(e) => e.currentTarget.style.boxShadow = styles.studentItem.boxShadow}
+                        >
                             <img src={student.studentPhoto || 'https://via.placeholder.com/60?text=P'} alt={student.fullName} style={styles.photo} />
                             <div style={styles.details}>
                                 <strong style={styles.studentName}>{student.fullName}</strong>
@@ -257,8 +287,22 @@ const AdminDashboard = ({ onLogout }) => {
                                 {student.notes && <p style={styles.studentNote}>📝 {student.notes}</p>}
                             </div>
                             <div style={styles.actions}>
-                                <button onClick={() => startEdit(student)} style={styles.editButton}>✏️ Edit</button>
-                                <button onClick={() => handleDelete(student._id)} style={styles.deleteButton}>🗑️ Delete</button>
+                                <button 
+                                    onClick={() => startEdit(student)} 
+                                    style={styles.editButton}
+                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.editButtonHover.backgroundColor}
+                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.editButton.backgroundColor}
+                                >
+                                    ✏️ Edit
+                                </button>
+                                <button 
+                                    onClick={() => handleDelete(student._id)} 
+                                    style={styles.deleteButton}
+                                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = styles.deleteButtonHover.backgroundColor}
+                                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = styles.deleteButton.backgroundColor}
+                                >
+                                    🗑️ Delete
+                                </button>
                             </div>
                         </div>
                     ))
@@ -288,6 +332,13 @@ const styles = {
         borderBottom: '2px solid #e0e6ed',
         marginBottom: '30px',
     },
+    headerShadow: { // Added shadow to header for visual depth
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+        backgroundColor: 'white', // Ensure header background is white for shadow contrast
+        padding: '20px 30px',
+        borderRadius: '10px 10px 0 0',
+        margin: '-30px -30px 30px -30px', // Extend header to edges of main container padding
+    },
     logoutButton: { 
         padding: '10px 18px', 
         backgroundColor: '#dc3545', // Red
@@ -298,6 +349,9 @@ const styles = {
         fontWeight: 'bold',
         boxShadow: '0 3px 6px rgba(0, 0, 0, 0.15)',
         transition: 'background-color 0.3s',
+    },
+    logoutButtonHover: {
+        backgroundColor: '#c82333', // Darker Red
     },
     accessDenied: {
         textAlign: 'center',
@@ -345,7 +399,6 @@ const styles = {
     },
     formContainer: { 
         display: 'grid', 
-        // 2 Columns Layout
         gridTemplateColumns: '1fr 1fr', 
         gap: '25px 40px', 
         maxWidth: '1000px',
@@ -373,6 +426,7 @@ const styles = {
         fontSize: '1em',
         boxSizing: 'border-box',
         transition: 'border-color 0.2s, box-shadow 0.2s',
+        // Note: Focus/Hover styles are difficult in static JS objects, but this baseline is good.
     },
     urlInputContainer: {
         display: 'flex',
@@ -387,10 +441,13 @@ const styles = {
         borderRadius: '8px', 
         cursor: 'pointer',
         fontWeight: 'bold',
-        transition: 'all 0.3s ease',
+        transition: 'background-color 0.3s, transform 0.1s',
         whiteSpace: 'nowrap', 
         height: '42px', 
         boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    },
+    uploadHelperButtonHover: {
+        backgroundColor: '#e0a800', // Darker Yellow
     },
     photoPreviewContainer: {
         marginTop: '15px',
@@ -433,6 +490,9 @@ const styles = {
         transition: 'background-color 0.3s, transform 0.1s',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
+    submitButtonHover: {
+        backgroundColor: '#1e7e34', // Darker Green
+    },
     updateButton: { 
         backgroundColor: '#007bff', // Blue
         color: 'white', 
@@ -445,6 +505,9 @@ const styles = {
         transition: 'background-color 0.3s, transform 0.1s',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
+    updateButtonHover: {
+        backgroundColor: '#0056b3', // Darker Blue
+    },
     cancelButton: { 
         backgroundColor: '#6c757d', // Grey
         color: 'white', 
@@ -456,6 +519,9 @@ const styles = {
         fontSize: '1em',
         transition: 'background-color 0.3s, transform 0.1s',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    },
+    cancelButtonHover: {
+        backgroundColor: '#5a6268', // Darker Grey
     },
 
     // Student List Styles
@@ -481,6 +547,10 @@ const styles = {
         borderRadius: '10px', 
         backgroundColor: '#ffffff', 
         boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)', 
+        transition: 'box-shadow 0.3s', // Added transition
+    },
+    studentItemHover: {
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)', // Stronger shadow on hover
     },
     noData: {
         textAlign: 'center',
@@ -542,7 +612,10 @@ const styles = {
         borderRadius: '25px', 
         cursor: 'pointer',
         fontWeight: '600',
-        transition: 'transform 0.1s',
+        transition: 'background-color 0.3s, transform 0.1s',
+    },
+    editButtonHover: {
+        backgroundColor: '#e0a800', // Darker Yellow
     },
     deleteButton: { 
         backgroundColor: '#dc3545', // Red
@@ -552,8 +625,11 @@ const styles = {
         borderRadius: '25px', 
         cursor: 'pointer',
         fontWeight: '600',
-        transition: 'transform 0.1s',
+        transition: 'background-color 0.3s, transform 0.1s',
     },
+    deleteButtonHover: {
+        backgroundColor: '#c82333', // Darker Red
+    }
 };
 
 export default AdminDashboard;

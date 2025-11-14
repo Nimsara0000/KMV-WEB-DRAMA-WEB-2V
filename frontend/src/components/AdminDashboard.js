@@ -1,3 +1,4 @@
+Here is the full, complete code for the improved AdminDashboard.js component:
 // frontend/src/components/AdminDashboard.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -19,8 +20,6 @@ const initialStudentState = {
     notes: ''
 };
 
-// 🛑 AdminDashboard එකට navigationProps (setCurrentPage) අවශ්‍ය නැත. 
-// onLogout පමණක් අවශ්‍ය වේ.
 const AdminDashboard = ({ onLogout }) => {
     const [students, setStudents] = useState([]);
     const [formData, setFormData] = useState(initialStudentState);
@@ -33,13 +32,16 @@ const AdminDashboard = ({ onLogout }) => {
             try {
                 const res = await axios.get(`${BASE_URL}/api/students`); 
                 setStudents(res.data);
-                setLoading(false);
             } catch (err) {
                 console.error('Error fetching students:', err);
+                alert('Error fetching student data. Please check the backend server status (Render.com).');
+            } finally {
+                setLoading(false); // Ensures loading screen is dismissed even on error
             }
         };
         fetchStudents();
         
+        // Socket.io for Real-time updates
         socket.on('students_updated', (updatedStudents) => {
             setStudents(updatedStudents);
         });
@@ -56,20 +58,27 @@ const AdminDashboard = ({ onLogout }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Basic Client-side Validation (10-digit contact number)
+        if (!/^\d{10}$/.test(formData.contactNumber)) {
+            alert('Please enter a valid 10-digit contact number.');
+            return;
+        }
+
         const dataToSend = { ...formData };
 
         try {
             if (isEditing) {
                 await axios.put(`${BASE_URL}/api/students/${editingId}`, dataToSend); 
-                alert('Student data updated successfully! (Real-time update triggered)');
+                alert('Student data updated successfully!');
             } else {
                 await axios.post(`${BASE_URL}/api/students`, dataToSend); 
-                alert('Student registered successfully! (Real-time update triggered)');
+                alert('New student registered successfully!');
             }
             resetForm();
         } catch (err) {
             console.error('Submission Error:', err.response?.data || err.message);
-            alert(`Error during submission: ${err.response?.data?.msg || 'Check console.'}`);
+            alert(`Error during submission: ${err.response?.data?.msg || 'Please check the Console.'}`);
         }
     };
 
@@ -80,7 +89,8 @@ const AdminDashboard = ({ onLogout }) => {
     };
 
     const startEdit = (student) => {
-        const dobString = student.dateOfBirth || ''; // Date format should match YYYY-MM-DD
+        // Formats date string correctly for the 'date' input type
+        const dobString = student.dateOfBirth ? student.dateOfBirth.substring(0, 10) : ''; 
         setFormData({ 
             ...student,
             dateOfBirth: dobString 
@@ -94,7 +104,7 @@ const AdminDashboard = ({ onLogout }) => {
         if (window.confirm('Are you sure you want to PERMANENTLY delete this student record?')) {
             try {
                 await axios.delete(`${BASE_URL}/api/students/${id}`); 
-                alert('Student removed successfully! (Real-time update triggered)');
+                alert('Student record successfully removed!');
                 if (editingId === id) {
                     resetForm();
                 }
@@ -105,85 +115,91 @@ const AdminDashboard = ({ onLogout }) => {
         }
     };
     
-    // 🛑 Note: App.js මගින් Admin Logged In Logic පාලනය කරයි, නමුත් මෙය ආරක්ෂාව සඳහා හොඳයි
-    if (!localStorage.getItem('adminToken')) {
+    // 🔒 Login Check
+    if (!localStorage.getItem('adminToken')) { 
         return (
              <div style={styles.accessDenied}>
-                <h1>🔒 Access Denied</h1>
+                <h1>🔒 Admin Access Denied</h1>
                 <p>Please log in as an administrator to view this page.</p>
              </div>
         );
     }
 
-    if (loading) return <div>Loading Admin Panel...</div>;
+    // 🔄 Loading Screen
+    if (loading) return (
+        <div style={styles.loadingContainer}>
+            <div style={styles.spinner}></div>
+            <p style={{marginTop: '20px', color: '#007bff'}}>Loading Data...</p>
+        </div>
+    );
 
     return (
         <div style={styles.container}>
             <header style={styles.header}>
                 <h1>🔑 Admin Registration Dashboard</h1>
-                {/* Logout බොත්තම Header එක තුළට */}
                 <button onClick={onLogout} style={styles.logoutButton}>
                     🚪 Logout
                 </button>
             </header>
             
             <div style={styles.formSection}>
-                <h2 style={styles.formHeading}>{isEditing ? '✏️ ශිෂ්‍ය තොරතුරු සංස්කරණය' : '➕ නව ශිෂ්‍ය ලියාපදිංචිය'}</h2>
+                <h2 style={styles.formHeading}>{isEditing ? '✏️ Edit Student Details' : '➕ Register New Student'}</h2>
                 <form onSubmit={handleSubmit} style={styles.formContainer}>
                     
-                    {/* Input Fields - Grid Layout */}
+                    {/* Input Fields */}
                     
-                    {/* Row 1: Full Name & DOB */}
+                    {/* Full Name */}
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>සම්පූර්ණ නම (Full Name):</label>
+                        <label style={styles.label}>Full Name:</label>
                         <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} style={styles.inputField} required />
                     </div>
+                    {/* DOB - Changed to type="date" */}
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>උපන් දිනය (DOB):</label>
+                        <label style={styles.label}>Date of Birth:</label>
                         <input 
-                            type="text" 
+                            type="date" // Uses native date picker
                             name="dateOfBirth" 
                             value={formData.dateOfBirth} 
                             onChange={handleChange} 
                             style={styles.inputField} 
-                            placeholder="YYYY-MM-DD (උදා: 2005-08-15)"
                             required 
                         />
                     </div>
                     
-                    {/* Row 2: Grade & Contact */}
+                    {/* Grade */}
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>ශ්‍රේණිය (Grade):</label>
+                        <label style={styles.label}>Grade:</label>
                         <select name="grade" value={formData.grade} onChange={handleChange} style={styles.inputField} required>
                             {GRADES.map(g => <option key={g} value={g}>{g}</option>)}
                         </select>
                     </div>
+                    {/* Contact Number */}
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>දුරකථන අංකය (Contact Number):</label>
+                        <label style={styles.label}>Contact Number:</label>
                         <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleChange} style={styles.inputField} required />
                     </div>
                     
-                    {/* Row 3: Parents' Names */}
+                    {/* Parents' Names */}
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>පියාගේ නම (Father's Name):</label>
+                        <label style={styles.label}>Father's Name:</label>
                         <input type="text" name="parentNameFather" value={formData.parentNameFather} onChange={handleChange} style={styles.inputField} required />
                     </div>
                     <div style={styles.inputGroup}>
-                        <label style={styles.label}>මවගේ නම (Mother's Name):</label>
+                        <label style={styles.label}>Mother's Name:</label>
                         <input type="text" name="parentNameMother" value={formData.parentNameMother} onChange={handleChange} style={styles.inputField} required />
                     </div>
                     
-                    {/* Row 4: Photo URL (Full Width) */}
+                    {/* Photo URL (Full Width) */}
                     <div style={styles.fullWidthGroup}>
-                        <label style={styles.label}>ශිෂ්‍ය ඡායාරූප URL (Student Photo URL):</label> 
+                        <label style={styles.label}>Student Photo URL:</label> 
                         <div style={styles.urlInputContainer}> 
                             <input 
-                                type="text" 
+                                type="url" // Uses URL input type for better validation
                                 name="studentPhoto" 
                                 value={formData.studentPhoto} 
                                 onChange={handleChange} 
                                 style={{...styles.inputField, flexGrow: 1}} 
-                                placeholder="Paste Image URL here (e.g., from Catbox.moe)" 
+                                placeholder="Paste Image URL here" 
                             />
                             <button 
                                 type="button" 
@@ -194,26 +210,32 @@ const AdminDashboard = ({ onLogout }) => {
                         </div>
                         {formData.studentPhoto && (
                             <div style={styles.photoPreviewContainer}>
-                                <img src={formData.studentPhoto} alt="Student Preview" style={styles.photoPreview} />
-                                <p style={styles.previewText}>ඡායාරූප පෙරදසුන</p>
+                                <img 
+                                    src={formData.studentPhoto} 
+                                    alt="Student Preview" 
+                                    style={styles.photoPreview} 
+                                    // Fallback for broken image URLs
+                                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/100?text=Invalid+URL'; }} 
+                                />
+                                <p style={styles.previewText}>Photo Preview</p>
                             </div>
                         )}
                     </div>
                     
-                    {/* Row 5: Notes (Full Width) */}
+                    {/* Notes (Full Width) */}
                     <div style={styles.fullWidthGroup}>
-                        <label style={styles.label}>අමතර සටහන් (Notes):</label>
+                        <label style={styles.label}>Notes:</label>
                         <textarea name="notes" value={formData.notes} onChange={handleChange} style={{...styles.inputField, minHeight: '80px'}}></textarea>
                     </div>
                     
                     <div style={styles.buttonGroup}>
                         {isEditing && (
                             <button type="button" onClick={resetForm} style={styles.cancelButton}>
-                                ❌ සංස්කරණය අවලංගු කරන්න
+                                ❌ Cancel Edit
                             </button>
                         )}
                         <button type="submit" style={isEditing ? styles.updateButton : styles.submitButton}>
-                            {isEditing ? '💾 විස්තර යාවත්කාලීන කරන්න' : '✅ ශිෂ්‍යයා ලියාපදිංචි කරන්න'}
+                            {isEditing ? '💾 Update Details' : '✅ Register Student'}
                         </button>
                     </div>
                 </form>
@@ -221,44 +243,50 @@ const AdminDashboard = ({ onLogout }) => {
 
             <hr style={{ margin: '40px 0', border: '1px solid #ddd' }} />
 
-            <h2 style={styles.listHeading}>📋 ලියාපදිංචි ශිෂ්‍ය වාර්තා</h2> 
+            <h2 style={styles.listHeading}>📋 Current Registered Students</h2> 
             <div style={styles.studentList}>
-                {students.map(student => (
-                    <div key={student._id} style={styles.studentItem}>
-                        <img src={student.studentPhoto || 'https://via.placeholder.com/60?text=P'} alt={student.fullName} style={styles.photo} />
-                        <div style={styles.details}>
-                            <strong style={styles.studentName}>{student.fullName}</strong>
-                            <span style={styles.studentGrade}> | {student.grade}</span>
-                            <p style={styles.studentContact}>📞 {student.contactNumber}</p>
-                            {student.notes && <p style={styles.studentNote}>📝 {student.notes}</p>}
+                {students.length === 0 ? (
+                    <p style={styles.noData}>No student records found.</p>
+                ) : (
+                    students.map(student => (
+                        <div key={student._id} style={styles.studentItem}>
+                            <img src={student.studentPhoto || 'https://via.placeholder.com/60?text=P'} alt={student.fullName} style={styles.photo} />
+                            <div style={styles.details}>
+                                <strong style={styles.studentName}>{student.fullName}</strong>
+                                <span style={styles.studentGrade}> | {student.grade}</span>
+                                <p style={styles.studentContact}>📞 {student.contactNumber}</p>
+                                {student.notes && <p style={styles.studentNote}>📝 {student.notes}</p>}
+                            </div>
+                            <div style={styles.actions}>
+                                <button onClick={() => startEdit(student)} style={styles.editButton}>✏️ Edit</button>
+                                <button onClick={() => handleDelete(student._id)} style={styles.deleteButton}>🗑️ Delete</button>
+                            </div>
                         </div>
-                        <div style={styles.actions}>
-                            <button onClick={() => startEdit(student)} style={styles.editButton}>✏️ Edit</button>
-                            <button onClick={() => handleDelete(student._id)} style={styles.deleteButton}>🗑️ Delete</button>
-                        </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
         </div>
     );
 };
 
-// ✨ නවීන සහ අලංකාර විලාසිතා (Styles) ✨
+// ----------------------------------------------------
+// ✨ Modern and Elegant Styles (CSS-in-JS) ✨
+// ----------------------------------------------------
 const styles = {
-    // ----------------------------------------------------
     // General Container & Header Styles
-    // ----------------------------------------------------
     container: { 
         padding: '30px', 
-        backgroundColor: '#f8f9fa', // Light background for contrast
+        backgroundColor: '#f4f7f9', // Light background
         borderRadius: '12px',
+        fontFamily: 'Arial, sans-serif',
+        minHeight: '100vh',
     },
     header: {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingBottom: '20px',
-        borderBottom: '2px solid #e9ecef',
+        padding: '10px 0 20px 0',
+        borderBottom: '2px solid #e0e6ed',
         marginBottom: '30px',
     },
     logoutButton: { 
@@ -275,22 +303,39 @@ const styles = {
     accessDenied: {
         textAlign: 'center',
         padding: '50px',
-        backgroundColor: '#fff3cd',
-        color: '#856404',
+        backgroundColor: '#ffe6e6',
+        color: '#cc0000',
         borderRadius: '8px',
-        border: '1px solid #ffeeba',
+        border: '1px solid #ffb3b3',
+        margin: '50px auto',
+        maxWidth: '500px',
     },
-
-    // ----------------------------------------------------
+    loadingContainer: {
+        textAlign: 'center',
+        padding: '50px',
+        margin: '50px auto',
+        maxWidth: '500px',
+        backgroundColor: '#ffffff',
+        borderRadius: '10px',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)',
+    },
+    spinner: {
+        border: '4px solid rgba(0, 0, 0, 0.1)',
+        borderTop: '4px solid #007bff',
+        borderRadius: '50%',
+        width: '40px',
+        height: '40px',
+        animation: 'spin 1s linear infinite',
+        margin: '0 auto',
+    },
+    
     // Form Section Styles
-    // ----------------------------------------------------
     formSection: { 
         padding: '40px', 
-        border: 'none', 
         borderRadius: '15px', 
         marginBottom: '40px', 
         backgroundColor: 'white',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)', // Stronger, modern shadow
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)', 
     },
     formHeading: {
         marginBottom: '30px',
@@ -301,7 +346,7 @@ const styles = {
     },
     formContainer: { 
         display: 'grid', 
-        // නව layout: 2 Columns
+        // 2 Columns Layout
         gridTemplateColumns: '1fr 1fr', 
         gap: '25px 40px', 
         maxWidth: '1000px',
@@ -312,12 +357,12 @@ const styles = {
         flexDirection: 'column',
     },
     fullWidthGroup: {
-        gridColumn: '1 / 3', // Spans both columns
+        gridColumn: '1 / 3', 
         display: 'flex',
         flexDirection: 'column',
     },
     label: {
-        marginBottom: '5px',
+        marginBottom: '8px',
         fontWeight: '600',
         color: '#495057',
         fontSize: '0.95em',
@@ -337,7 +382,7 @@ const styles = {
     },
     uploadHelperButton: {
         padding: '10px 15px',
-        backgroundColor: '#ffc107', // Orange/Yellow
+        backgroundColor: '#ffc107', 
         color: '#333', 
         border: 'none', 
         borderRadius: '8px', 
@@ -377,7 +422,9 @@ const styles = {
         paddingTop: '20px',
         borderTop: '1px solid #e9ecef',
     },
-    baseButton: {
+    submitButton: { 
+        backgroundColor: '#28a745', // Green
+        color: 'white', 
         padding: '12px 30px', 
         border: 'none', 
         borderRadius: '8px', 
@@ -387,29 +434,35 @@ const styles = {
         transition: 'background-color 0.3s, transform 0.1s',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
-    submitButton: { 
-        ...this.baseButton,
-        backgroundColor: '#28a745', // Green
-        color: 'white', 
-    },
     updateButton: { 
-        ...this.baseButton,
         backgroundColor: '#007bff', // Blue
         color: 'white', 
+        padding: '12px 30px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        fontWeight: 'bold',
+        fontSize: '1em',
+        transition: 'background-color 0.3s, transform 0.1s',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
     cancelButton: { 
-        ...this.baseButton,
         backgroundColor: '#6c757d', // Grey
         color: 'white', 
+        padding: '12px 30px', 
+        border: 'none', 
+        borderRadius: '8px', 
+        cursor: 'pointer', 
+        fontWeight: 'bold',
+        fontSize: '1em',
+        transition: 'background-color 0.3s, transform 0.1s',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
     },
 
-    // ----------------------------------------------------
     // Student List Styles
-    // ----------------------------------------------------
     listHeading: {
         maxWidth: '1000px', 
         margin: '40px auto 20px auto', 
-        padding: '0 20px', 
         color: '#343a40',
         borderLeft: '5px solid #007bff',
         paddingLeft: '15px',
@@ -420,17 +473,24 @@ const styles = {
         gap: '15px',
         maxWidth: '1000px',
         margin: '0 auto', 
-        padding: '0 20px', 
     },
     studentItem: { 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between', 
         padding: '15px 25px', 
-        border: '1px solid #f0f0f0', 
         borderRadius: '10px', 
         backgroundColor: '#ffffff', 
-        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)', // Clearer separation
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.08)', 
+    },
+    noData: {
+        textAlign: 'center',
+        padding: '20px',
+        backgroundColor: '#fffbe6',
+        border: '1px solid #ffeeba',
+        borderRadius: '8px',
+        color: '#856404',
+        margin: '20px 0',
     },
     photo: { 
         width: '55px', 
@@ -475,7 +535,9 @@ const styles = {
         gap: '12px',
         flexShrink: 0,
     },
-    actionButtonBase: {
+    editButton: { 
+        backgroundColor: '#ffc107', // Amber/Yellow
+        color: 'black',
         border: 'none', 
         padding: '8px 12px', 
         borderRadius: '25px', 
@@ -483,15 +545,15 @@ const styles = {
         fontWeight: '600',
         transition: 'transform 0.1s',
     },
-    editButton: { 
-        ...this.actionButtonBase,
-        backgroundColor: '#ffc107', // Amber/Yellow
-        color: 'black',
-    },
     deleteButton: { 
-        ...this.actionButtonBase,
         backgroundColor: '#dc3545', // Red
         color: 'white', 
+        border: 'none', 
+        padding: '8px 12px', 
+        borderRadius: '25px', 
+        cursor: 'pointer',
+        fontWeight: '600',
+        transition: 'transform 0.1s',
     },
 };
 

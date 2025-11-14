@@ -6,13 +6,14 @@ import io from 'socket.io-client';
 const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
 const socket = io(BASE_URL); 
 
+// 🎨 නවීන වර්ණ පද්ධතිය
 const GRADE_COLORS = {
-    '6 ශ්‍රේණිය': '#A8E6CF', 
-    '7 ශ්‍රේණිය': '#FFC3A0', 
-    '8 ශ්‍රේණිය': '#FF6768', 
-    '9 ශ්‍රේණිය': '#6AB4FF', 
-    '10 ශ්‍රේණිය': '#FFD700', 
-    '11 ශ්‍රේණිය': '#B28CFF', 
+    '6 ශ්‍රේණිය': '#A8E6CF', // Light Green
+    '7 ශ්‍රේණිය': '#FFC3A0', // Light Coral
+    '8 ශ්‍රේණිය': '#FF6768', // Strong Coral
+    '9 ශ්‍රේණිය': '#6AB4FF', // Light Blue
+    '10 ශ්‍රේණිය': '#FFD700', // Gold
+    '11 ශ්‍රේණිය': '#B28CFF', // Lavender
 };
 const GRADES = Object.keys(GRADE_COLORS);
 
@@ -110,27 +111,33 @@ const HomeDashboard = ({ onLogout }) => {
                                     {count > 0 ? (
                                         studentsInGrade.map(student => (
                                             <div key={student._id} style={styles.studentItem}>
-                                                <img src={student.studentPhoto || 'https://via.placeholder.com/40?text=P'} alt={student.fullName} style={styles.studentPhoto} />
+                                                
                                                 <div style={styles.studentDetails}>
-                                                    <strong style={{color: '#1E90FF', fontSize: '1.1em'}}>{student.fullName}</strong>
-                                                    <p style={styles.detailText}>🎂 උපන් දිනය: {student.dateOfBirth}</p>
                                                     
-                                                    <p style={styles.detailText}>🧔 පියාගේ නම: {student.parentNameFather}</p>
-                                                    <p style={styles.detailText}>👩 මවගේ නම: {student.parentNameMother}</p>
+                                                    {/* 🛑 නම */}
+                                                    <strong style={styles.studentNameHeader}>{student.fullName}</strong>
                                                     
+                                                    {/* 🛑 උපන් දිනය */}
+                                                    <p style={styles.detailText}>🎂 උපන් දිනය: <span style={styles.highlightText}>{student.dateOfBirth}</span></p>
+                                                    
+                                                    {/* 🛑 දෙමාපියන්ගේ නම් */}
+                                                    <p style={styles.detailText}>🧔 පියා: <span style={styles.highlightText}>{student.parentNameFather}</span></p>
+                                                    <p style={styles.detailText}>👩 මව: <span style={styles.highlightText}>{student.parentNameMother}</span></p>
+                                                    
+                                                    {/* 📞 දුරකථන අංකය */}
                                                     <p style={styles.detailText}>📞 දුරකථන අංකය: {student.contactNumber}</p>
                                                 </div>
                                                 
-                                                {/* WhatsApp Icon */}
+                                                {/* 🛑 WhatsApp බොත්තම */}
                                                 {student.contactNumber && (
                                                     <a 
-                                                        href={`https://wa.me/${student.contactNumber}`} 
+                                                        href={`https://wa.me/94${student.contactNumber.replace(/^0/, '')}`} 
                                                         target="_blank" 
                                                         rel="noopener noreferrer" 
                                                         style={styles.whatsappLink}
                                                     >
-                                                        <span style={styles.whatsappIcon}>
-                                                            🟢 WhatsApp
+                                                        <span style={styles.whatsappButton}>
+                                                            💬 WhatsApp Message
                                                         </span>
                                                     </a>
                                                 )}
@@ -154,7 +161,7 @@ const HomeDashboard = ({ onLogout }) => {
     );
 };
 
-// ✨ යාවත්කාලීන කළ විලාසිතා (Styles) ✨
+// ✨ නවීන සහ අලංකාර විලාසිතා (Styles) ✨
 const styles = {
     container: {
         padding: '40px 20px',
@@ -189,6 +196,7 @@ const styles = {
         marginBottom: '10px',
         borderRadius: '15px',
         overflow: 'hidden', 
+        border: '1px solid #ddd', // පැහැදිලි සීමාවක් සඳහා
     },
     gradeCard: {
         padding: '20px 25px',
@@ -232,39 +240,37 @@ const styles = {
     
     // Student List Styles (දිග හැරෙන කොටස)
     studentList: {
-        backgroundColor: '#ffffff',
-        padding: '10px 0',
-        borderTop: '1px solid #eee',
+        backgroundColor: '#fcfcfc',
+        padding: '15px 0',
+        borderTop: '2px solid #e0e0e0',
         boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
-        borderBottomLeftRadius: '15px', 
-        borderBottomRightRadius: '15px',
-        marginTop: '-15px', 
-        paddingTop: '25px',
     },
     studentItem: {
         display: 'flex',
         alignItems: 'center',
-        padding: '10px 20px',
-        borderBottom: '1px dotted #e0e0e0',
+        padding: '15px 20px',
+        borderBottom: '1px solid #f0f0f0',
         justifyContent: 'space-between', 
-    },
-    studentPhoto: {
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        marginRight: '15px',
-        objectFit: 'cover',
-        border: '2px solid #6AB4FF',
-        flexShrink: 0, 
     },
     studentDetails: {
         textAlign: 'left',
         flexGrow: 1, 
     },
+    studentNameHeader: {
+        color: '#007BFF',
+        fontSize: '1.2em',
+        fontWeight: 'bold',
+        marginBottom: '5px',
+        display: 'block',
+    },
     detailText: {
         margin: '2px 0',
         fontSize: '0.9em',
         color: '#444',
+    },
+    highlightText: {
+        fontWeight: '600',
+        color: '#333',
     },
     noStudents: {
         textAlign: 'center',
@@ -272,21 +278,22 @@ const styles = {
         padding: '10px 0',
     },
     
-    // WhatsApp Link Style
+    // WhatsApp Button Style
     whatsappLink: {
         textDecoration: 'none',
         flexShrink: 0, 
-        marginLeft: '10px',
+        marginLeft: '15px',
     },
-    whatsappIcon: {
-        padding: '5px 10px',
+    whatsappButton: {
+        padding: '8px 15px',
         backgroundColor: '#25D366', 
         color: 'white',
-        borderRadius: '20px',
-        fontSize: '0.9em',
+        borderRadius: '25px',
+        fontSize: '0.85em',
         fontWeight: 'bold',
         whiteSpace: 'nowrap',
-        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+        boxShadow: '0 4px 10px rgba(37, 211, 102, 0.4)',
+        cursor: 'pointer',
     },
 
     totalCount: {

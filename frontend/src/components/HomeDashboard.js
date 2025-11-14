@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
-import { useNavigate } from 'react-router-dom'; // 👈 New: Navigation සඳහා
+// import { useNavigate } from 'react-router-dom'; // 🛑 ඉවත් කරන ලදි.
 
 const BASE_URL = 'https://kmv-web-drama-web-2v.onrender.com'; 
 const socket = io(BASE_URL); 
@@ -30,22 +30,21 @@ const groupStudentsByGrade = (students) => {
     }, {});
 };
 
-const HomeDashboard = ({ onLogout }) => {
+// 🛑 Updated: setCurrentPage prop එක ලබා ගනී
+const HomeDashboard = ({ onLogout, setCurrentPage }) => { 
     const [allStudents, setAllStudents] = useState([]);
     const [groupedStudents, setGroupedStudents] = useState({});
     const [loading, setLoading] = useState(true);
     const [expandedGrade, setExpandedGrade] = useState(null); 
     const [menuOpen, setMenuOpen] = useState(false); // ☰ Menu තත්ත්වය
     
-    // 👈 New: Navigation Hook
-    const navigate = useNavigate();
+    // 🛑 const navigate = useNavigate(); // ඉවත් කරන ලදි.
     
-    // 👈 New: Admin Token පරීක්ෂා කිරීම
+    // 👈 Admin Token පරීක්ෂා කිරීම
     const isAdmin = !!localStorage.getItem('adminToken');
 
     useEffect(() => {
         const fetchStudents = async () => {
-            // ... (දත්ත ලබා ගැනීමේ කේතය පෙර පරිදිම)
             try {
                 const res = await axios.get(`${BASE_URL}/api/students`);
                 const students = res.data;
@@ -78,14 +77,14 @@ const HomeDashboard = ({ onLogout }) => {
         setMenuOpen(!menuOpen);
     };
     
-    // 👈 New: Navigation Handlers
+    // 🛑 Updated: Navigation Handlers - setCurrentPage භාවිතා කරයි
     const handleHomeClick = () => {
-        navigate('/');
+        setCurrentPage('home'); // navigate('/') වෙනුවට
         setMenuOpen(false);
     };
     
     const handleAdminPanelClick = () => {
-        navigate('/admin');
+        setCurrentPage('admin'); // navigate('/admin') වෙනුවට
         setMenuOpen(false);
     };
     
@@ -94,7 +93,7 @@ const HomeDashboard = ({ onLogout }) => {
         setMenuOpen(false);
     };
     
-    // 👇 Search Functionality (Basic) - දැනට ක්‍රියාත්මක නොවේ
+    // 👇 Search Functionality (Basic)
     const [searchTerm, setSearchTerm] = useState('');
     
     const filteredStudents = allStudents.filter(student => 
@@ -136,7 +135,8 @@ const HomeDashboard = ({ onLogout }) => {
                                     <button style={{...styles.menuItem, backgroundColor: '#dc3545'}} onClick={handleLogoutClick}>Logout</button>
                                 </>
                             ) : (
-                                <button style={{...styles.menuItem, backgroundColor: '#007bff'}} onClick={() => navigate('/login')}>Admin Login</button>
+                                // 🛑 Updated: setCurrentPage භාවිතා කරයි
+                                <button style={{...styles.menuItem, backgroundColor: '#007bff'}} onClick={() => setCurrentPage('login')}>Admin Login</button>
                             )}
                         </div>
                     )}
@@ -190,7 +190,7 @@ const HomeDashboard = ({ onLogout }) => {
                                             studentsInGrade.map(student => (
                                                 <div key={student._id} style={styles.studentItem}>
                                                     
-                                                    {/* 🛑 Updated: Student Photo එක පෙන්වීම */}
+                                                    {/* 🛑 Student Photo එක පෙන්වීම */}
                                                     <img 
                                                         src={student.studentPhoto || 'https://via.placeholder.com/50?text=S'} 
                                                         alt={student.fullName} 

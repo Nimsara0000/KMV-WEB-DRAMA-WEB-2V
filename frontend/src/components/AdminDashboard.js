@@ -1,4 +1,3 @@
-Here is the full, complete code for the improved AdminDashboard.js component:
 // frontend/src/components/AdminDashboard.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';

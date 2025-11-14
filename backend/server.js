@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // 🛑 Frontend Vercel URL එක නිවැරදිව මෙහි සඳහන් කර ඇත
-const VERCEL_FRONTEND_URL = 'https://kmv-web-drama.vercel.app';
+const VERCEL_FRONTEND_URL = 'https://kmv-web-drama-web-2-v.vercel.app';
 
 // MongoDB URL (ඔබ ලබා දුන් URL එක)
 const mongoURI = 'mongodb+srv://nimatest:nimatest@nimatest.bdf6c2a.mongodb.net/'; 

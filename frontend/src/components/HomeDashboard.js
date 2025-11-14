@@ -112,18 +112,16 @@ const HomeDashboard = ({ onLogout }) => {
                                             <div key={student._id} style={styles.studentItem}>
                                                 <img src={student.studentPhoto || 'https://via.placeholder.com/40?text=P'} alt={student.fullName} style={styles.studentPhoto} />
                                                 <div style={styles.studentDetails}>
-                                                    {/* 🛑 නම සහ උපන් දිනය */}
                                                     <strong style={{color: '#1E90FF', fontSize: '1.1em'}}>{student.fullName}</strong>
-                                                    <p style={styles.detailText}>🎂 උපන් දිනය: **{student.dateOfBirth}**</p>
+                                                    <p style={styles.detailText}>🎂 උපන් දිනය: {student.dateOfBirth}</p>
                                                     
-                                                    {/* 🛑 මවගේ සහ පියාගේ නම් */}
                                                     <p style={styles.detailText}>🧔 පියාගේ නම: {student.parentNameFather}</p>
                                                     <p style={styles.detailText}>👩 මවගේ නම: {student.parentNameMother}</p>
                                                     
                                                     <p style={styles.detailText}>📞 දුරකථන අංකය: {student.contactNumber}</p>
                                                 </div>
                                                 
-                                                {/* 🛑 WhatsApp Icon */}
+                                                {/* WhatsApp Icon */}
                                                 {student.contactNumber && (
                                                     <a 
                                                         href={`https://wa.me/${student.contactNumber}`} 
@@ -248,7 +246,7 @@ const styles = {
         alignItems: 'center',
         padding: '10px 20px',
         borderBottom: '1px dotted #e0e0e0',
-        justifyContent: 'space-between', // WhatsApp Icon එක දකුණට ගැනීමට
+        justifyContent: 'space-between', 
     },
     studentPhoto: {
         width: '40px',
@@ -257,11 +255,11 @@ const styles = {
         marginRight: '15px',
         objectFit: 'cover',
         border: '2px solid #6AB4FF',
-        flexShrink: 0, // කුඩා නොවන පරිදි
+        flexShrink: 0, 
     },
     studentDetails: {
         textAlign: 'left',
-        flexGrow: 1, // වැඩි ඉඩක් ගැනීමට
+        flexGrow: 1, 
     },
     detailText: {
         margin: '2px 0',
@@ -274,15 +272,15 @@ const styles = {
         padding: '10px 0',
     },
     
-    // 🛑 WhatsApp Link Style
+    // WhatsApp Link Style
     whatsappLink: {
         textDecoration: 'none',
-        flexShrink: 0, // කුඩා නොවන පරිදි
+        flexShrink: 0, 
         marginLeft: '10px',
     },
     whatsappIcon: {
         padding: '5px 10px',
-        backgroundColor: '#25D366', // WhatsApp Green
+        backgroundColor: '#25D366', 
         color: 'white',
         borderRadius: '20px',
         fontSize: '0.9em',
